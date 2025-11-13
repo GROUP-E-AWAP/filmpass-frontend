@@ -7,7 +7,7 @@ export default defineConfig({
     port: 5173,
     proxy: {
       "/api": {
-        target: "http://localhost:8080",
+        target: "https://filmpass-api-c7hbe8acdah0gceb.swedencentral-01.azurewebsites.net/s",
         changeOrigin: true,
         rewrite: p => p.replace(/^\/api/, "")
       }
