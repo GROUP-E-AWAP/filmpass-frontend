@@ -1,45 +1,37 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { api } from "../api";
-import SeatMap from "../components/SeatMap.jsx";
 
 export default function Movie() {
   const { id } = useParams();
   const [data, setData] = useState(null);
-  const [seats, setSeats] = useState([]);
-  const [selected, setSelected] = useState([]);
   const [showId, setShowId] = useState("");
-  const [ticketType, setTicketType] = useState("adult");
+  const [qty, setQty] = useState(1);
   const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
   const [msg, setMsg] = useState("");
 
   useEffect(() => {
     api.movieDetails(id).then(setData);
   }, [id]);
 
-  useEffect(() => {
-    if (showId) api.seats(showId).then(setSeats);
-  }, [showId]);
-
-  function toggleSeat(id) {
-    setSelected(prev => prev.includes(id) ? prev.filter(x=>x!==id) : [...prev, id]);
-  }
+  const selectedShow = useMemo(
+    () => data?.showtimes.find(s => String(s.id) === String(showId)),
+    [data, showId]
+  );
 
   async function book() {
     setMsg("");
+    if (!showId || !qty) { setMsg("Select showtime and quantity"); return; }
     try {
-      const res = await api.book({
-        showtimeId: showId,
-        customerEmail: email || "customer@example.com",
-        seats: selected,
-        ticketType
+      const res = await api.createBooking({
+        userEmail: email || "guest@example.com",
+        userName: name || "Guest",
+        showtimeId: Number(showId),
+        seats: Number(qty)
       });
-      setMsg(`Booking confirmed: ${res.bookingId}, total €${res.total.toFixed(2)}`);
-      setSelected([]);
-      if (showId) {
-        const s = await api.seats(showId);
-        setSeats(s);
-      }
+      setMsg(`Booking #${res.bookingId} confirmed. Total €${Number(res.total).toFixed(2)}`);
+      setQty(1);
     } catch (e) {
       setMsg("Error: " + e.message);
     }
@@ -48,49 +40,40 @@ export default function Movie() {
   if (!data) return <div>Loading...</div>;
   return (
     <div>
-      <div style={{ display: "flex", gap: 16, marginBottom: 16 }}>
-        <img src={data.movie.poster_url} alt={data.movie.title} width="220" style={{ borderRadius: 8 }} />
-        <div>
-          <h2>{data.movie.title}</h2>
-          <p style={{ color: "#444" }}>{data.movie.description}</p>
-          <div>Duration: {data.movie.duration_minutes} min</div>
-          <div style={{ marginTop: 12 }}>
-            <label>Showtime: </label>
-            <select value={showId} onChange={e => setShowId(e.target.value)}>
-              <option value="">Select showtime</option>
-              {data.showtimes.map(s => (
-                <option value={s.id} key={s.id}>
-                  {new Date(s.start_time).toLocaleString()} (Adult €{s.price_adult.toFixed(2)} / Child €{s.price_child.toFixed(2)})
-                </option>
-              ))}
-            </select>
-          </div>
-          <div style={{ marginTop: 8 }}>
-            <label>Ticket type: </label>
-            <select value={ticketType} onChange={e => setTicketType(e.target.value)}>
-              <option value="adult">Adult</option>
-              <option value="child">Child</option>
-            </select>
-          </div>
-          <div style={{ marginTop: 8 }}>
-            <label>Email: </label>
-            <input value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com" />
-          </div>
-        </div>
+      <h2>{data.movie.title}</h2>
+      {data.movie.description && <p style={{ color: "#444" }}>{data.movie.description}</p>}
+
+      <div style={{ marginTop: 12 }}>
+        <label>Showtime: </label>
+        <select value={showId} onChange={e => setShowId(e.target.value)}>
+          <option value="">Select showtime</option>
+          {data.showtimes.map(s => (
+            <option value={s.id} key={s.id}>
+              {new Date(s.show_date + " " + s.start_time).toLocaleString()} — {s.theater_name} ({s.theater_location}) — €{Number(s.price).toFixed(2)}
+            </option>
+          ))}
+        </select>
       </div>
 
-      {showId ? (
-        <>
-          <h3>Seat selection</h3>
-          <SeatMap seats={seats} selected={selected} toggle={toggleSeat} />
-          <div style={{ marginTop: 12, display: "flex", gap: 8 }}>
-            <button onClick={book} disabled={selected.length === 0}>Book {selected.length} seat(s)</button>
-            {msg && <div>{msg}</div>}
-          </div>
-        </>
-      ) : (
-        <div>Select showtime to load seats</div>
-      )}
+      <div style={{ marginTop: 8 }}>
+        <label>Tickets: </label>
+        <input type="number" min="1" value={qty} onChange={e => setQty(e.target.value)} style={{ width: 80 }} />
+        {selectedShow && <span style={{ marginLeft: 10 }}>Price: €{(Number(selectedShow.price) * Number(qty)).toFixed(2)}</span>}
+      </div>
+
+      <div style={{ marginTop: 8 }}>
+        <label>Name: </label>
+        <input value={name} onChange={e => setName(e.target.value)} placeholder="Your name" />
+      </div>
+      <div style={{ marginTop: 8 }}>
+        <label>Email: </label>
+        <input value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" />
+      </div>
+
+      <div style={{ marginTop: 12 }}>
+        <button onClick={book} disabled={!showId || !qty}>Book</button>
+      </div>
+      {msg && <p style={{ marginTop: 10 }}>{msg}</p>}
     </div>
   );
 }

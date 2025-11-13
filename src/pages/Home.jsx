@@ -14,17 +14,13 @@ export default function Home() {
   return (
     <div>
       <h2>Movies</h2>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px,1fr))", gap: 16 }}>
+      <ul style={{ lineHeight: 1.8 }}>
         {movies.map(m => (
-          <Link key={m.id} to={`/movie/${m.id}`} style={{ textDecoration: "none", color: "inherit" }}>
-            <div style={{ border: "1px solid #ddd", borderRadius: 8, padding: 12 }}>
-              <img src={m.poster_url} alt={m.title} style={{ width: "100%", borderRadius: 6, marginBottom: 8 }} />
-              <div style={{ fontWeight: 600 }}>{m.title}</div>
-              <div style={{ color: "#555" }}>{m.duration_minutes} min</div>
-            </div>
-          </Link>
+          <li key={m.id}>
+            <Link to={`/movie/${m.id}`}>{m.title}</Link>
+          </li>
         ))}
-      </div>
+      </ul>
     </div>
   );
 }
