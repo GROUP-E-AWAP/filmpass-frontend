@@ -15,3 +15,7 @@ This is a React application built with Vite.
     ```
 
 This will start the development server, and you can view the project in your browser at the address provided in the terminal output (usually `http://localhost:5173`).
+
+
+## Website URL
+* https://witty-forest-0cd95ca1e.3.azurestaticapps.net/
