@@ -8,6 +8,7 @@ export default function App() {
         <Link to="/" style={{ textDecoration: "none", color: "#111" }}>
           <h1>FilmPass</h1>
         </Link>
+        <Link to="/admin" style={{ textDecoration: "none", color: "#007bff" }}>Admin</Link>
       </header>
       <Outlet />
     </div>
