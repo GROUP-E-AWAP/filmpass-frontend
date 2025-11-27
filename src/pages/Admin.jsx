@@ -5,6 +5,8 @@ export default function Admin() {
     const [movies, setMovies] = useState([]);
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
+    const [duration, setDuration] = useState("");
+    const [posterUrl, setPosterUrl] = useState("");
     const [msg, setMsg] = useState("");
 
     useEffect(() => {
@@ -18,12 +20,22 @@ export default function Admin() {
     async function handleAdd(e) {
         e.preventDefault();
         setMsg("");
-        if (!title) return;
+        if (!title || !duration) {
+            setMsg("Title and duration are required");
+            return;
+        }
 
         try {
-            await api.createMovie({ title, description });
+            await api.createMovie({
+                title,
+                description,
+                duration_minutes: Number(duration),
+                poster_url: posterUrl
+            });
             setTitle("");
             setDescription("");
+            setDuration("");
+            setPosterUrl("");
             setMsg("Movie added successfully");
             loadMovies();
         } catch (err) {
@@ -63,6 +75,23 @@ export default function Admin() {
                             value={description}
                             onChange={e => setDescription(e.target.value)}
                             style={{ width: "100%", padding: 8, minHeight: 60 }}
+                        />
+                    </div>
+                    <div style={{ marginBottom: 8 }}>
+                        <label style={{ display: "block", marginBottom: 4 }}>Duration (minutes):</label>
+                        <input
+                            type="number"
+                            value={duration}
+                            onChange={e => setDuration(e.target.value)}
+                            style={{ width: "100%", padding: 8 }}
+                        />
+                    </div>
+                    <div style={{ marginBottom: 8 }}>
+                        <label style={{ display: "block", marginBottom: 4 }}>Poster URL:</label>
+                        <input
+                            value={posterUrl}
+                            onChange={e => setPosterUrl(e.target.value)}
+                            style={{ width: "100%", padding: 8 }}
                         />
                     </div>
                     <button type="submit" style={{ padding: "8px 16px" }}>Add Movie</button>
