@@ -1,18 +1,27 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { api } from "../api";
 
 export default function Movie() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [showId, setShowId] = useState("");
   const [qty, setQty] = useState(1);
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [msg, setMsg] = useState("");
+  const [msgType, setMsgType] = useState("");
 
   useEffect(() => {
-    api.movieDetails(id).then(setData);
+    setLoading(true);
+    setError("");
+    api.movieDetails(id)
+      .then(setData)
+      .catch(e => setError(String(e)))
+      .finally(() => setLoading(false));
   }, [id]);
 
   const selectedShow = useMemo(
@@ -22,58 +31,266 @@ export default function Movie() {
 
   async function book() {
     setMsg("");
-    if (!showId || !qty) { setMsg("Select showtime and quantity"); return; }
+    setMsgType("");
+    if (!showId || !qty) {
+      setMsg("Please select a showtime and number of tickets");
+      setMsgType("error");
+      return;
+    }
     try {
       const res = await api.createBooking({
         userEmail: email || "guest@example.com",
         userName: name || "Guest",
-        showtimeId: Number(showId),
+        showtimeId: showId,
         seats: Number(qty)
       });
-      setMsg(`Booking #${res.bookingId} confirmed. Total €${Number(res.total).toFixed(2)}`);
+      setMsg(`✓ Booking confirmed! Booking ID: ${res.bookingId} | Total: €${Number(res.total).toFixed(2)}`);
+      setMsgType("success");
       setQty(1);
+      setShowId("");
+      setEmail("");
+      setName("");
     } catch (e) {
-      setMsg("Error: " + e.message);
+      setMsg(`✗ ${e.message}`);
+      setMsgType("error");
     }
   }
 
-  if (!data) return <div>Loading...</div>;
+  if (loading) {
+    return (
+      <div className="loading">
+        <div className="loading-spinner"></div>
+        <p style={{ marginTop: "16px" }}>Loading movie details...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div style={{ marginBottom: "32px" }}>
+        <button
+          onClick={() => navigate("/")}
+          style={{
+            marginBottom: "16px",
+            padding: "8px 16px",
+            background: "#e50914",
+            color: "white",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer",
+            fontSize: "14px",
+          }}
+        >
+          ← Back to Movies
+        </button>
+        <div className="message error">
+          <strong>Error:</strong> {error}
+        </div>
+      </div>
+    );
+  }
+
+  if (!data) {
+    return (
+      <div>
+        <button
+          onClick={() => navigate("/")}
+          style={{
+            marginBottom: "16px",
+            padding: "8px 16px",
+            background: "#e50914",
+            color: "white",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer",
+            fontSize: "14px",
+          }}
+        >
+          ← Back to Movies
+        </button>
+        <div className="empty-state">
+          <p className="empty-state-text">Movie not found</p>
+        </div>
+      </div>
+    );
+  }
+
+  const posterUrl = data.movie.poster_url || null;
+
   return (
     <div>
-      <h2>{data.movie.title}</h2>
-      {data.movie.description && <p style={{ color: "#444" }}>{data.movie.description}</p>}
+      <button
+        onClick={() => navigate("/")}
+        style={{
+          marginBottom: "24px",
+          padding: "8px 16px",
+          background: "transparent",
+          color: "#e50914",
+          border: "2px solid #e50914",
+          borderRadius: "4px",
+          cursor: "pointer",
+          fontSize: "14px",
+          fontWeight: "600",
+          transition: "all 0.3s ease",
+        }}
+      >
+        ← Back to Movies
+      </button>
 
-      <div style={{ marginTop: 12 }}>
-        <label>Showtime: </label>
-        <select value={showId} onChange={e => setShowId(e.target.value)}>
-          <option value="">Select showtime</option>
-          {data.showtimes.map(s => (
-            <option value={s.id} key={s.id}>
-              {new Date(s.show_date + " " + s.start_time).toLocaleString()} — {s.theater_name} ({s.theater_location}) — €{Number(s.price).toFixed(2)}
-            </option>
-          ))}
-        </select>
-      </div>
+      <div className="movie-detail-container">
+        <div className="movie-detail-header">
+          <div className="movie-detail-poster">
+            {posterUrl ? (
+              <img src={posterUrl} alt={data.movie.title} />
+            ) : (
+              <div style={{ textAlign: "center", color: "#999" }}>
+                <div style={{ fontSize: "64px", marginBottom: "8px" }}>🎬</div>
+                <div>No poster available</div>
+              </div>
+            )}
+          </div>
 
-      <div style={{ marginTop: 8 }}>
-        <label>Tickets: </label>
-        <input type="number" min="1" value={qty} onChange={e => setQty(e.target.value)} style={{ width: 80 }} />
-        {selectedShow && <span style={{ marginLeft: 10 }}>Price: €{(Number(selectedShow.price) * Number(qty)).toFixed(2)}</span>}
-      </div>
+          <div className="movie-detail-info">
+            <h2>{data.movie.title}</h2>
 
-      <div style={{ marginTop: 8 }}>
-        <label>Name: </label>
-        <input value={name} onChange={e => setName(e.target.value)} placeholder="Your name" />
-      </div>
-      <div style={{ marginTop: 8 }}>
-        <label>Email: </label>
-        <input value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" />
-      </div>
+            <div className="movie-detail-meta">
+              {data.movie.duration_minutes && (
+                <div className="meta-item">
+                  <div className="meta-label">Duration</div>
+                  <div className="meta-value">{data.movie.duration_minutes} minutes</div>
+                </div>
+              )}
+              {data.movie.genre && (
+                <div className="meta-item">
+                  <div className="meta-label">Genre</div>
+                  <div className="meta-value">{data.movie.genre}</div>
+                </div>
+              )}
+              {data.movie.release_date && (
+                <div className="meta-item">
+                  <div className="meta-label">Release Date</div>
+                  <div className="meta-value">
+                    {new Date(data.movie.release_date).toLocaleDateString()}
+                  </div>
+                </div>
+              )}
+            </div>
 
-      <div style={{ marginTop: 12 }}>
-        <button onClick={book} disabled={!showId || !qty}>Book</button>
+            {data.movie.description && (
+              <p className="movie-description">{data.movie.description}</p>
+            )}
+
+            {data.showtimes && data.showtimes.length > 0 && (
+              <div>
+                <h3 style={{ fontSize: "16px", fontWeight: "600", marginBottom: "12px" }}>
+                  Available Showtimes
+                </h3>
+                <ul style={{ listStyle: "none", color: "#666", fontSize: "14px" }}>
+                  {data.showtimes.slice(0, 3).map(s => (
+                    <li key={s.id} style={{ marginBottom: "8px", paddingLeft: "24px" }}>
+                      <span style={{ fontWeight: "600", color: "#221f1f" }}>
+                        {new Date(s.start_time).toLocaleString()}
+                      </span>
+                      <span style={{ marginLeft: "16px" }}>{s.theater_name}</span>
+                      <span style={{ marginLeft: "16px", color: "#e50914", fontWeight: "600" }}>
+                        €{Number(s.price).toFixed(2)}
+                      </span>
+                    </li>
+                  ))}
+                  {data.showtimes.length > 3 && (
+                    <li style={{ marginTop: "12px", color: "#999", fontSize: "13px" }}>
+                      +{data.showtimes.length - 3} more showtimes available
+                    </li>
+                  )}
+                </ul>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {data.showtimes && data.showtimes.length > 0 && (
+          <div className="booking-section">
+            <h3>Book Your Tickets</h3>
+
+            <form className="booking-form">
+              <div className="form-group">
+                <label>Select Showtime *</label>
+                <select value={showId} onChange={e => setShowId(e.target.value)}>
+                  <option value="">Choose a showtime</option>
+                  {data.showtimes.map(s => (
+                    <option value={s.id} key={s.id}>
+                      {new Date(s.start_time).toLocaleString()} — {s.theater_name} — €{Number(s.price).toFixed(2)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="form-group-row">
+                <div className="form-group">
+                  <label>Number of Tickets *</label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="10"
+                    value={qty}
+                    onChange={e => setQty(e.target.value)}
+                  />
+                  {selectedShow && (
+                    <div className="price-info">
+                      Total: <span className="price">€{(Number(selectedShow.price) * Number(qty)).toFixed(2)}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label>Full Name</label>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={e => setName(e.target.value)}
+                  placeholder="Your full name (optional)"
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Email Address</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  placeholder="your@email.com (optional)"
+                />
+              </div>
+
+              <button
+                type="button"
+                onClick={book}
+                disabled={!showId || !qty}
+                className="booking-button"
+              >
+                {selectedShow
+                  ? `Book for €${(Number(selectedShow.price) * Number(qty)).toFixed(2)}`
+                  : "Select Showtime to Book"}
+              </button>
+
+              {msg && (
+                <div className={`message ${msgType}`}>
+                  {msg}
+                </div>
+              )}
+            </form>
+          </div>
+        )}
+
+        {(!data.showtimes || data.showtimes.length === 0) && (
+          <div className="booking-section">
+            <p style={{ color: "#999", textAlign: "center" }}>
+              ℹ️ No showtimes available for this movie
+            </p>
+          </div>
+        )}
       </div>
-      {msg && <p style={{ marginTop: 10 }}>{msg}</p>}
     </div>
   );
 }

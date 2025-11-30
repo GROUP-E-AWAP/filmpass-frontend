@@ -1,16 +1,21 @@
 import React from "react";
 import { Outlet, Link } from "react-router-dom";
+import "./style/global.css";
 
 export default function App() {
   return (
-    <div style={{ fontFamily: "Inter, system-ui, sans-serif", maxWidth: 960, margin: "0 auto", padding: 24 }}>
-      <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
-        <Link to="/" style={{ textDecoration: "none", color: "#111" }}>
-          <h1>FilmPass</h1>
-        </Link>
-        <Link to="/admin" style={{ textDecoration: "none", color: "#007bff" }}>Admin</Link>
+    <div>
+      <header>
+        <div className="header-container">
+          <Link to="/">
+            <h1>FilmPass</h1>
+          </Link>
+          <Link to="/admin">Admin</Link>
+        </div>
       </header>
-      <Outlet />
+      <main className="main-container">
+        <Outlet />
+      </main>
     </div>
   );
 }
