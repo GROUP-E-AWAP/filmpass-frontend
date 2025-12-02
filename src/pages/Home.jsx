@@ -1,112 +1,98 @@
 import React, { useEffect, useState } from "react";
+import { Link, useParams } from "react-router-dom";
 import { api } from "../api";
-import { SearchBar } from "../components/searchBar";
-import { MovieCard } from "../components/MovieCard";
 
+/**
+ * Home page for customers.
+ * Shows a list of movies available in the currently selected theater.
+ *
+ * Theater context is taken from route params:
+ *   /theaters/:theaterId/movies → theaterId
+ */
 export default function Home() {
+  const { theaterId } = useParams();
   const [movies, setMovies] = useState([]);
-  const [moviePrices, setMoviePrices] = useState({});
-  const [loading, setLoading] = useState(true);
-  const [err, setErr] = useState("");
-  const [searchTerm, setSearchTerm] = useState("");
+  const [error, setError] = useState("");
 
+  // Load movies whenever theaterId changes
   useEffect(() => {
-    setLoading(true);
-    api.listMovies()
-      .then(movies => {
-        setMovies(movies);
-        // Fetch showtimes for each movie to get pricing
-        return Promise.all(
-          movies.map(movie =>
-            api.getShowtimes(movie.id)
-              .then(showtimes => {
-                console.log(`Showtimes for movie ${movie.id}:`, showtimes);
-                // Handle both array and object responses
-                let showArray = Array.isArray(showtimes) ? showtimes : (showtimes?.data || []);
-                if (showArray && showArray.length > 0) {
-                  const prices = showArray.map(s => {
-                    console.log(`Showtime:`, s, `Price field:`, s.price);
-                    return Number(s.price);
-                  }).filter(p => !isNaN(p));
-                  if (prices.length > 0) {
-                    const minPrice = Math.min(...prices);
-                    console.log(`Min price for ${movie.id}:`, minPrice);
-                    return { movieId: movie.id, minPrice };
-                  }
-                }
-                return null;
-              })
-              .catch(err => {
-                console.warn(`Failed to fetch showtimes for movie ${movie.id}:`, err);
-                return null;
-              })
-          )
-        ).then(results => {
-          const prices = {};
-          results.forEach(result => {
-            if (result) {
-              prices[result.movieId] = result.minPrice;
-            }
-          });
-          setMoviePrices(prices);
-        });
+    setMovies([]);
+    setError("");
+
+    // If theater is not selected, we can't show movies
+    if (!theaterId) {
+      setError("Theater is not selected.");
+      return;
+    }
+
+    api
+      .listMoviesByTheater(theaterId)
+      .then(data => {
+        setMovies(data);
       })
-      .catch(e => setErr(String(e)))
-      .finally(() => setLoading(false));
-  }, []);
-
-  const filteredMovies = movies.filter((movie) =>
-    movie.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  if (loading) {
-    return (
-      <div className="loading">
-        <div className="loading-spinner"></div>
-        <p style={{ marginTop: "16px" }}>Loading movies...</p>
-      </div>
-    );
-  }
-
-  if (err) {
-    return (
-      <div className="message error">
-        <strong>Error:</strong> {err}
-      </div>
-    );
-  }
+      .catch(e => {
+        console.error("Failed to load movies", e);
+        setError("Failed to load movies");
+      });
+  }, [theaterId]);
 
   return (
     <div>
-      <div className="search-wrapper">
-        <SearchBar onSearch={setSearchTerm} />
-      </div>
+      <h2>Movies</h2>
 
-      <div style={{ marginBottom: "24px" }}>
-        <h2 style={{ fontSize: "28px", marginBottom: "8px" }}>
-          Movies & Showtimes
-        </h2>
-        <p style={{ color: "#666", fontSize: "14px" }}>
-          Showing {filteredMovies.length} of {movies.length} movies
-        </p>
-      </div>
+      {/* Display error if theater is missing or API failed */}
+      {error && <p style={{ color: "red" }}>{error}</p>}
 
-      {filteredMovies.length === 0 ? (
-        <div className="empty-state">
-          <div className="empty-state-icon">🎬</div>
-          <p className="empty-state-text">
-            {searchTerm
-              ? `No movies found matching "${searchTerm}"`
-              : "No movies available"}
-          </p>
-        </div>
-      ) : (
-        <div className="movies-grid">
-          {filteredMovies.map(m => (
-            <MovieCard key={m.id} movie={m} minPrice={moviePrices[m.id]} />
-          ))}
-        </div>
-      )}
+      <div className="movie-grid">
+        {movies.map(m => (
+          <div className="movie-card" key={m.id}>
+            {/* Movie poster (if provided) */}
+            {m.poster_url && (
+              <img
+                src={m.poster_url}
+                alt={m.title}
+                style={{
+                  width: "100%",
+                  borderRadius: 8,
+                  marginBottom: 10,
+                  objectFit: "cover",
+                  maxHeight: 260
+                }}
+              />
+            )}
+
+            {/* Movie title */}
+            <div className="movie-title">{m.title}</div>
+
+            {/* Short description snippet */}
+            <div
+              style={{
+                fontSize: 14,
+                opacity: 0.7,
+                marginBottom: 10,
+                minHeight: 40
+              }}
+            >
+              {m.description
+                ? m.description.slice(0, 80) +
+                  (m.description.length > 80 ? "…" : "")
+                : "No description yet"}
+            </div>
+
+            {/* Link to movie details page, preserving theaterId in query */}
+            <Link
+              to={`/movie/${m.id}?theaterId=${encodeURIComponent(theaterId)}`}
+            >
+              <button type="button">View details</button>
+            </Link>
+          </div>
+        ))}
+
+        {/* No movies for this theater, but also no error */}
+        {movies.length === 0 && !error && (
+          <p style={{ marginTop: 10 }}>No movies found for this theater.</p>
+        )}
+      </div>
     </div>
   );
 }
