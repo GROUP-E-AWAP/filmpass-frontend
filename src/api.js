@@ -1,10 +1,15 @@
 const BASE = import.meta.env.VITE_API_BASE || "http://localhost:8080";
 
 async function fetchJSON(path, options) {
-  const res = await fetch(`${BASE}${path}`, options);
+  const fullUrl = `${BASE}${path}`;
+  console.log(`Making API request to: ${fullUrl}`, options?.method || 'GET');
+  
+  const res = await fetch(fullUrl, options);
   if (!res.ok) {
     const error = await res.json().catch(() => ({}));
-    throw new Error(error.error || `${res.status} ${res.statusText}`);
+    const errorMessage = error.error || `${res.status} ${res.statusText}`;
+    console.error(`API Error (${fullUrl}):`, errorMessage);
+    throw new Error(errorMessage);
   }
   return res.json();
 }
@@ -37,5 +42,16 @@ export const api = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
-    })
+    }),
+  
+  // Payment
+  createCheckoutSession: payload =>
+    fetchJSON(`/create-checkout-session`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    }),
+  
+  verifyPayment: sessionId =>
+    fetchJSON(`/verify-payment?session_id=${sessionId}`)
 };

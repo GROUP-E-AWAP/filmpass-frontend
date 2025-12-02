@@ -25,9 +25,12 @@ export default function Home() {
                 let showArray = Array.isArray(showtimes) ? showtimes : (showtimes?.data || []);
                 if (showArray && showArray.length > 0) {
                   const prices = showArray.map(s => {
-                    console.log(`Showtime:`, s, `Price field:`, s.price);
-                    return Number(s.price);
-                  }).filter(p => !isNaN(p));
+                    // Try multiple possible price field names and ensure numeric conversion
+                    const priceValue = s.price || s.Price || s.ticket_price || s.ticketPrice || 0;
+                    const numPrice = parseFloat(priceValue);
+                    console.log(`Showtime:`, s, `Price field:`, priceValue, `Converted:`, numPrice);
+                    return numPrice;
+                  }).filter(p => !isNaN(p) && p > 0);
                   if (prices.length > 0) {
                     const minPrice = Math.min(...prices);
                     console.log(`Min price for ${movie.id}:`, minPrice);

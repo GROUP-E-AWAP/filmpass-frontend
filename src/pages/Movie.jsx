@@ -2,6 +2,14 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { api } from "../api";
 
+// Helper function to safely extract price from showtime object
+const getPrice = (showtime) => {
+  if (!showtime) return 0;
+  const priceValue = showtime.price || showtime.Price || showtime.ticket_price || showtime.ticketPrice || 0;
+  const numPrice = parseFloat(priceValue);
+  return isNaN(numPrice) ? 0 : numPrice;
+};
+
 export default function Movie() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -37,23 +45,20 @@ export default function Movie() {
       setMsgType("error");
       return;
     }
-    try {
-      const res = await api.createBooking({
+
+    // Navigate to checkout page with booking data
+    navigate("/checkout", {
+      state: {
+        showtimeId: showId,
+        seats: Number(qty),
         userEmail: email || "guest@example.com",
         userName: name || "Guest",
-        showtimeId: showId,
-        seats: Number(qty)
-      });
-      setMsg(`✓ Booking confirmed! Booking ID: ${res.bookingId} | Total: €${Number(res.total).toFixed(2)}`);
-      setMsgType("success");
-      setQty(1);
-      setShowId("");
-      setEmail("");
-      setName("");
-    } catch (e) {
-      setMsg(`✗ ${e.message}`);
-      setMsgType("error");
-    }
+        movieTitle: data.movie.title,
+        showtime: selectedShow.start_time,
+        theaterName: selectedShow.theater_name,
+        price: getPrice(selectedShow),
+      },
+    });
   }
 
   if (loading) {
@@ -193,7 +198,7 @@ export default function Movie() {
                       </span>
                       <span style={{ marginLeft: "16px" }}>{s.theater_name}</span>
                       <span style={{ marginLeft: "16px", color: "#e50914", fontWeight: "600" }}>
-                        €{Number(s.price).toFixed(2)}
+                        €{getPrice(s).toFixed(2)}
                       </span>
                     </li>
                   ))}
@@ -219,7 +224,7 @@ export default function Movie() {
                   <option value="">Choose a showtime</option>
                   {data.showtimes.map(s => (
                     <option value={s.id} key={s.id}>
-                      {new Date(s.start_time).toLocaleString()} — {s.theater_name} — €{Number(s.price).toFixed(2)}
+                      {new Date(s.start_time).toLocaleString()} — {s.theater_name} — €{getPrice(s).toFixed(2)}
                     </option>
                   ))}
                 </select>
@@ -237,7 +242,7 @@ export default function Movie() {
                   />
                   {selectedShow && (
                     <div className="price-info">
-                      Total: <span className="price">€{(Number(selectedShow.price) * Number(qty)).toFixed(2)}</span>
+                      Total: <span className="price">€{(getPrice(selectedShow) * Number(qty)).toFixed(2)}</span>
                     </div>
                   )}
                 </div>
@@ -270,7 +275,7 @@ export default function Movie() {
                 className="booking-button"
               >
                 {selectedShow
-                  ? `Book for €${(Number(selectedShow.price) * Number(qty)).toFixed(2)}`
+                  ? `Book for €${(getPrice(selectedShow) * Number(qty)).toFixed(2)}`
                   : "Select Showtime to Book"}
               </button>
 
