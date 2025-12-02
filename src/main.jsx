@@ -3,10 +3,8 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import App from "./App.jsx";
 import "./index.css";
+import "./style/global.css";
 import { AuthProvider } from "./authContext.jsx";
-import Checkout from "./pages/Checkout.jsx";
-import PaymentSuccess from "./pages/PaymentSuccess.jsx";
-import PaymentCancel from "./pages/PaymentCancel.jsx";
 
 // Entry point: create root React tree and wrap it in Router + Auth context
 ReactDOM.createRoot(document.getElementById("root")).render(
@@ -15,11 +13,8 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     <BrowserRouter>
       {/* AuthProvider stores user session + login/register logic */}
       <AuthProvider>
-        {/* Main application layout */}
+        {/* Main application layout with all routes */}
         <App />
-        <Route path="/checkout" element={<Checkout />} />
-        <Route path="/payment-success" element={<PaymentSuccess />} />
-        <Route path="/payment-cancel" element={<PaymentCancel />} />
       </AuthProvider>
     </BrowserRouter>
   </React.StrictMode>

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useParams, useSearchParams, useNavigate } from "react-router-dom";
 import { api } from "../api";
 
 // Helper function to safely extract price from showtime object
@@ -26,6 +26,7 @@ export default function Movie() {
   const { id } = useParams(); // movie id from URL
   const [searchParams] = useSearchParams();
   const theaterId = searchParams.get("theaterId"); // optional theater context
+  const navigate = useNavigate();
 
   const [data, setData] = useState(null);
   const [pageError, setPageError] = useState("");
@@ -115,13 +116,13 @@ export default function Movie() {
     navigate("/checkout", {
       state: {
         showtimeId: showId,
-        seats: Number(qty),
+        seats: selected.length,
         userEmail: email || "guest@example.com",
         userName: name || "Guest",
         movieTitle: data.movie.title,
-        showtime: selectedShow.start_time,
-        theaterName: selectedShow.theater_name,
-        price: getPrice(selectedShow),
+        showtime: currentShow?.start_time,
+        theaterName: currentShow?.theater_name,
+        price: getPrice(currentShow),
       },
     });
   }
@@ -135,7 +136,7 @@ export default function Movie() {
     );
   }
 
-  if (error) {
+  if (pageError) {
     return (
       <div style={{ marginBottom: "32px" }}>
         <button
@@ -154,7 +155,7 @@ export default function Movie() {
           ← Back to Movies
         </button>
         <div className="message error">
-          <strong>Error:</strong> {error}
+          <strong>Error:</strong> {pageError}
         </div>
       </div>
     );
@@ -190,16 +191,29 @@ export default function Movie() {
   return (
     <div className="movie-page">
       {/* Movie poster + basic info */}
-      <div
-        style={{
-          display: "flex",
-          gap: 20,
-          marginBottom: 20,
-          flexWrap: "wrap"
-        }}
-      >
-        ← Back to Movies
-      </button>
+        <div
+          style={{
+            display: "flex",
+            gap: 20,
+            marginBottom: 20,
+            flexWrap: "wrap"
+          }}
+        >
+          <button
+            onClick={() => navigate("/")}
+            style={{
+              marginBottom: "16px",
+              padding: "8px 16px",
+              background: "#e50914",
+              color: "white",
+              border: "none",
+              borderRadius: "4px",
+              cursor: "pointer",
+              fontSize: "14px",
+            }}
+          >
+            ← Back to Movies
+          </button>
 
       <div className="movie-detail-container">
         <div className="movie-detail-header">
@@ -271,6 +285,8 @@ export default function Movie() {
             )}
           </div>
         </div>
+      </div>
+    </div>
 
       {/* Booking form: showtime, ticket type, user details, seats */}
       <form
@@ -286,7 +302,7 @@ export default function Movie() {
             style={{ marginTop: 4 }}
           >
             <option value="">Select showtime</option>
-            {showtimes.map(st => {
+            {data.showtimes.map(st => {
               // Convert date/time fields to readable string
               const dt = st.start_time
                 ? new Date(st.start_time)

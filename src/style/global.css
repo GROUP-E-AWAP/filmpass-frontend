@@ -65,11 +65,25 @@ header a:hover {
   color: white;
 }
 
-/* Main Container */
+/* Main Container - Standard content wrapper */
 .main-container {
+  width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 24px 16px;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .main-container {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 600px) {
+  .main-container {
+    padding: 12px;
+  }
 }
 
 /* Search Bar Wrapper */
@@ -177,6 +191,9 @@ header a:hover {
   border-radius: var(--border-radius);
   overflow: hidden;
   box-shadow: var(--box-shadow);
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .movie-detail-header {
@@ -186,11 +203,27 @@ header a:hover {
   padding: 40px;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .movie-detail-header {
     grid-template-columns: 1fr;
     gap: 24px;
-    padding: 24px;
+    padding: 32px;
+  }
+}
+
+@media (max-width: 768px) {
+  .movie-detail-header {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 20px;
+  }
+}
+
+@media (max-width: 600px) {
+  .movie-detail-header {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 16px;
   }
 }
 
@@ -267,16 +300,37 @@ header a:hover {
   background: var(--light-bg);
   padding: 40px;
   border-top: 1px solid #eee;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .booking-form {
+  width: 100%;
   max-width: 600px;
+  margin: 0 auto;
 }
 
 .booking-section h3 {
   font-size: 24px;
   margin-bottom: 24px;
   color: var(--text-dark);
+}
+
+@media (max-width: 768px) {
+  .booking-section {
+    padding: 24px;
+  }
+}
+
+@media (max-width: 600px) {
+  .booking-section {
+    padding: 16px;
+  }
+
+  .booking-section h3 {
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
 }
 
 .form-group {
@@ -427,11 +481,26 @@ header a:hover {
   font-size: 18px;
 }
 
-/* Checkout Page Styles */
+/* Payment Page Wrapper */
+.payment-page {
+  width: 100%;
+  margin: 0;
+  padding: 24px 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: auto;
+}
+
+/* Checkout container - full width responsive */
 .checkout-container {
+  width: 100%;
   max-width: 800px;
-  margin: 0 auto;
-  padding: 24px;
+  padding: 0 16px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .checkout-card {
@@ -439,6 +508,83 @@ header a:hover {
   border-radius: var(--border-radius);
   box-shadow: var(--box-shadow);
   padding: 32px;
+  margin: 24px 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .payment-page {
+    padding: 16px 0;
+  }
+
+  .checkout-container {
+    padding: 0 12px;
+  }
+
+  .checkout-card {
+    padding: 24px;
+    margin: 16px 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .payment-page {
+    padding: 12px 0;
+  }
+
+  .checkout-container {
+    padding: 0 8px;
+  }
+
+  .checkout-card {
+    padding: 20px 16px;
+    margin: 12px 0;
+  }
+}
+
+/* Payment result container - full width responsive */
+.payment-result-container {
+  width: 100%;
+  max-width: 700px;
+  padding: 0 16px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.payment-result-card {
+  background: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  padding: 40px 32px;
+  text-align: center;
+  margin: 24px 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .payment-result-container {
+    padding: 0 12px;
+  }
+
+  .payment-result-card {
+    padding: 28px 20px;
+    margin: 16px 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .payment-result-container {
+    padding: 0 8px;
+  }
+
+  .payment-result-card {
+    padding: 20px 16px;
+    margin: 12px 0;
+  }
 }
 
 .checkout-title {
@@ -577,20 +723,7 @@ header a:hover {
   margin: 8px 0;
 }
 
-/* Payment Result Pages Styles */
-.payment-result-container {
-  max-width: 700px;
-  margin: 0 auto;
-  padding: 24px;
-}
 
-.payment-result-card {
-  background: white;
-  border-radius: var(--border-radius);
-  box-shadow: var(--box-shadow);
-  padding: 48px 32px;
-  text-align: center;
-}
 
 .result-icon {
   font-size: 80px;
@@ -699,38 +832,236 @@ header a:hover {
   min-width: 200px;
 }
 
-/* Responsive Design for Payment Pages */
-@media (max-width: 768px) {
-  .checkout-card,
-  .payment-result-card {
-    padding: 24px 16px;
+.confirmation-message {
+  background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%);
+  border: 2px solid #4caf50;
+  border-radius: var(--border-radius);
+  padding: 20px;
+  margin: 24px 0;
+  text-align: center;
+  color: #2e7d32;
+}
+
+.confirmation-message p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.booking-id {
+  font-family: 'Courier New', monospace;
+  background: #f5f5f1;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: 700;
+}
+
+.seat-list {
+  font-family: 'Courier New', monospace;
+  background: #f5f5f1;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.error-details {
+  background: #fff3cd !important;
+  border-left: 4px solid #ffc107 !important;
+}
+
+.error-details ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.error-details li {
+  padding: 6px 0;
+  padding-left: 24px;
+  position: relative;
+}
+
+.error-details li:before {
+  content: "→";
+  position: absolute;
+  left: 0;
+  color: #ff6f00;
+  font-weight: bold;
+}
+
+
+
+/* Print Styles */
+@media print {
+  body {
+    background: white;
   }
 
+  .payment-result-container {
+    max-width: 100%;
+    padding: 0;
+  }
+
+  .payment-result-card {
+    box-shadow: none;
+    border: 1px solid #ddd;
+  }
+
+  .result-actions {
+    display: none;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    display: none;
+  }
+
+  .payment-info {
+    border-top: 2px solid #ddd;
+    padding-top: 20px;
+    margin-top: 20px;
+  }
+
+  .booking-summary {
+    page-break-inside: avoid;
+  }
+}
+
+/* Enhanced Responsiveness for Payment Pages */
+@media (max-width: 600px) {
   .checkout-title,
   .payment-result-card h2 {
-    font-size: 24px;
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+
+  .checkout-details {
+    margin-bottom: 16px;
+  }
+
+  .detail-section {
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+
+  .detail-section h3 {
+    font-size: 16px;
+    margin-bottom: 12px;
+  }
+
+  .detail-item,
+  .summary-item {
+    padding: 8px 0;
+    font-size: 14px;
+  }
+
+  .detail-label,
+  .summary-label {
+    font-size: 13px;
+  }
+
+  .detail-value,
+  .summary-value {
+    font-size: 14px;
+    text-align: left;
+    margin-top: 4px;
+  }
+
+  .total-item {
+    font-size: 16px;
+    padding: 12px 0;
+  }
+
+  .total-amount {
+    font-size: 20px;
   }
 
   .checkout-actions,
   .result-actions {
     flex-direction: column;
+    gap: 12px;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    flex: 1;
+    min-width: unset;
+    width: 100%;
   }
 
   .result-icon {
-    width: 100px;
-    height: 100px;
-    font-size: 60px;
+    width: 70px;
+    height: 70px;
+    font-size: 40px;
+    margin-bottom: 16px;
   }
 
-  .detail-item,
-  .summary-item {
-    flex-direction: column;
-    gap: 4px;
+  .confirmation-message {
+    padding: 14px;
+    margin: 16px 0;
   }
 
-  .detail-value,
-  .summary-value {
-    text-align: left;
+  .confirmation-message p {
+    font-size: 13px;
+  }
+
+  .error-details {
+    font-size: 12px !important;
+    padding: 12px !important;
+    margin-top: 12px !important;
+  }
+
+  .error-details p {
+    margin: 6px 0;
+  }
+
+  .error-details ul {
+    margin: 6px 0 0 0;
+    padding-left: 16px;
+  }
+
+  .error-details li {
+    padding: 4px 0 4px 20px;
+    font-size: 12px;
+  }
+
+  .booking-summary {
+    padding: 16px;
+    margin: 20px 0;
+  }
+
+  .booking-summary h3 {
+    font-size: 18px;
+    margin-bottom: 16px;
+  }
+
+  .payment-info {
+    font-size: 12px;
+  }
+
+  .payment-info p {
+    margin: 6px 0;
+  }
+}
+
+/* Tablet and larger adjustments */
+@media (min-width: 601px) and (max-width: 1024px) {
+  .checkout-container,
+  .payment-result-container {
+    padding: 0 20px;
+  }
+
+  .checkout-card,
+  .payment-result-card {
+    padding: 28px 24px;
+  }
+
+  .checkout-title,
+  .payment-result-card h2 {
+    font-size: 26px;
+  }
+
+  .result-icon {
+    width: 90px;
+    height: 90px;
+    font-size: 50px;
   }
 }
 

@@ -20,9 +20,19 @@ a:hover {
 /* ===== LAYOUT WRAPPER ===== */
 /* Centers page content and limits width */
 .container {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 20px;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.container > main {
+  flex: 1;
+  width: 100%;
+  padding: 0;
+  margin: 0;
 }
 
 /* ===== HEADER AREA ===== */
@@ -134,14 +144,19 @@ button:disabled {
 /* ===== FOOTER ===== */
 /* Simple centered footer with separator line */
 footer {
-  margin-top: 40px;
-  padding: 16px 0 24px;
+  width: 100%;
+  margin-top: auto;
+  padding: 24px 16px;
   font-size: 13px;
   color: #6b7280;
   border-top: 1px solid #e5e7eb;
   display: flex;
-  justify-content: space-between;
-  gap: 12px;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+  background: white;
+  box-shadow: 0 -1px 3px rgba(0,0,0,0.05);
 }
 
 footer span:last-child {
@@ -151,47 +166,82 @@ footer span:last-child {
 /* ===== RESPONSIVE RULES ===== */
 /* Adjust spacing and layout for tablets and phones */
 @media (max-width: 768px) {
-  .container {
-    padding: 12px;
-  }
-
   header {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
+    padding: 12px 16px;
+  }
+
+  header h1 {
+    font-size: 24px;
   }
 
   header nav {
     margin-top: 4px;
   }
 
+  header nav a {
+    font-size: 13px;
+    margin-left: 10px;
+  }
+
   .movie-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
   }
 
   .movie-page {
     padding: 16px;
   }
+}
+
+@media (max-width: 600px) {
+  header {
+    padding: 12px;
+  }
+
+  header h1 {
+    font-size: 20px;
+  }
+
+  nav a {
+    font-size: 12px;
+    margin-left: 8px;
+  }
+
+  .movie-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  form {
+    max-width: 100%;
+    padding: 16px;
+  }
+
+  button {
+    padding: 12px 16px;
+    font-size: 14px;
+  }
 
   footer {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    font-size: 12px;
   }
 }
 
 /* Full-height layout: footer stays at bottom */
 html, body, #root {
   height: 100%;
+  width: 100%;
   margin: 0;
   padding: 0;
 }
 
-.container {
-  display: flex;
-  flex-direction: column;
-  min-height: 100%;
-}
-
-main {
-  flex: 1;
+body {
+  background: #f5f5f5;
 }

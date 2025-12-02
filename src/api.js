@@ -13,7 +13,7 @@ const BASE = import.meta.env.VITE_API_BASE || "/api";
  */
 async function fetchJSON(path, options = {}) {
   const fullUrl = `${BASE}${path}`;
-  console.log(`Making API request to: ${fullUrl}`, options?.method || 'GET');
+  console.log(`📡 Making API request to: ${fullUrl}`, options?.method || 'GET');
   
   const token = getToken();
 
@@ -30,7 +30,9 @@ async function fetchJSON(path, options = {}) {
   let text = "";
   try {
     text = await res.text();
-  } catch {
+    console.log(`📥 Response status: ${res.status}, body: ${text.substring(0, 200)}`);
+  } catch (e) {
+    console.error(`❌ Error reading response body:`, e);
     text = "";
   }
 
@@ -38,16 +40,23 @@ async function fetchJSON(path, options = {}) {
   if (text) {
     try {
       data = JSON.parse(text); // If valid JSON → parse
-    } catch {
+      console.log(`✅ Parsed JSON response:`, data);
+    } catch (e) {
       // Non-JSON text response → leave as-is
+      console.warn(`⚠️  Response is not JSON, returning as text`);
+      data = text;
     }
   }
 
   // If request failed, throw detailed error
   if (!res.ok) {
-    const error = await res.json().catch(() => ({}));
-    const errorMessage = error.error || `${res.status} ${res.statusText}`;
-    console.error(`API Error (${fullUrl}):`, errorMessage);
+    let errorMessage = `${res.status} ${res.statusText}`;
+    if (typeof data === 'object' && data?.error) {
+      errorMessage = data.error;
+    } else if (typeof data === 'string') {
+      errorMessage = data;
+    }
+    console.error(`❌ API Error (${fullUrl}):`, errorMessage);
     throw new Error(errorMessage);
   }
 
@@ -132,5 +141,5 @@ export const api = {
     }),
   
   verifyPayment: sessionId =>
-    fetchJSON(`/verify-payment?session_id=${sessionId}`)
+    fetchJSON(`/verify-payment?session_id=${encodeURIComponent(sessionId)}`)
 };
