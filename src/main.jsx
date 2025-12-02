@@ -1,25 +1,26 @@
 import React from "react";
-import { createRoot } from "react-dom/client";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import ReactDOM from "react-dom/client";
+import { BrowserRouter } from "react-router-dom";
 import App from "./App.jsx";
-import Home from "./pages/Home.jsx";
-import Movie from "./pages/Movie.jsx";
-import Admin from "./pages/Admin.jsx";
+import "./index.css";
+import { AuthProvider } from "./authContext.jsx";
 import Checkout from "./pages/Checkout.jsx";
 import PaymentSuccess from "./pages/PaymentSuccess.jsx";
 import PaymentCancel from "./pages/PaymentCancel.jsx";
 
-createRoot(document.getElementById("root")).render(
-  <BrowserRouter>
-    <Routes>
-      <Route path="/" element={<App />}>
-        <Route index element={<Home />} />
-        <Route path="/movie/:id" element={<Movie />} />
-        <Route path="/admin" element={<Admin />} />
+// Entry point: create root React tree and wrap it in Router + Auth context
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <React.StrictMode>
+    {/* BrowserRouter enables client-side routing */}
+    <BrowserRouter>
+      {/* AuthProvider stores user session + login/register logic */}
+      <AuthProvider>
+        {/* Main application layout */}
+        <App />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/payment-success" element={<PaymentSuccess />} />
         <Route path="/payment-cancel" element={<PaymentCancel />} />
-      </Route>
-    </Routes>
-  </BrowserRouter>
+      </AuthProvider>
+    </BrowserRouter>
+  </React.StrictMode>
 );

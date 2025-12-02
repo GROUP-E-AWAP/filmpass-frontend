@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { api } from "../api";
 
 // Helper function to safely extract price from showtime object
@@ -9,40 +9,105 @@ const getPrice = (showtime) => {
   const numPrice = parseFloat(priceValue);
   return isNaN(numPrice) ? 0 : numPrice;
 };
+import SeatMap from "../components/SeatMap.jsx";
+import { getStoredUser } from "../auth";
 
+/**
+ * Movie details + booking page.
+ *
+ * Responsibilities:
+ *  - Load movie details + available showtimes (optionally filtered by theater)
+ *  - Let user choose showtime, ticket type, seats
+ *  - Handle booking as:
+ *      - authenticated user (from JWT / local storage)
+ *      - guest (name + email required)
+ */
 export default function Movie() {
-  const { id } = useParams();
-  const navigate = useNavigate();
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [showId, setShowId] = useState("");
-  const [qty, setQty] = useState(1);
-  const [email, setEmail] = useState("");
-  const [name, setName] = useState("");
-  const [msg, setMsg] = useState("");
-  const [msgType, setMsgType] = useState("");
+  const { id } = useParams(); // movie id from URL
+  const [searchParams] = useSearchParams();
+  const theaterId = searchParams.get("theaterId"); // optional theater context
 
+  const [data, setData] = useState(null);
+  const [pageError, setPageError] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  // Booking-related state
+  const [showId, setShowId] = useState(""); // selected showtime id
+  const [seats, setSeats] = useState([]);   // seats for current showtime
+  const [selected, setSelected] = useState([]); // selected seat ids
+  const [ticketType, setTicketType] = useState("adult");
+
+  // Guest booking info (for non-auth users)
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+
+  const [msg, setMsg] = useState("");
+
+  // Initial auth info (used to pre-fill name/email or hide guest fields)
+  const [authUser] = useState(() => getStoredUser());
+
+  // ===== Load movie + showtimes =====
+  // Taking into account optional theaterId filter
   useEffect(() => {
     setLoading(true);
-    setError("");
-    api.movieDetails(id)
-      .then(setData)
-      .catch(e => setError(String(e)))
-      .finally(() => setLoading(false));
-  }, [id]);
+    setPageError("");
+    setShowId("");
+    setSeats([]);
+    setSelected([]);
 
-  const selectedShow = useMemo(
-    () => data?.showtimes.find(s => String(s.id) === String(showId)),
+    api
+      .movieDetails(id, theaterId ? { theaterId } : undefined)
+      .then(d => {
+        setData(d);
+        setLoading(false);
+      })
+      .catch(e => {
+        console.error("movieDetails error:", e);
+        setPageError(e.message);
+        setLoading(false);
+      });
+  }, [id, theaterId]);
+
+  // ===== Auto-fill name/email from authenticated user (if logged in) =====
+  useEffect(() => {
+    if (authUser) {
+      setName(authUser.name || authUser.email || "");
+      setEmail(authUser.email || "");
+    }
+  }, [authUser]);
+
+  // ===== Load seats for selected showtime =====
+  useEffect(() => {
+    if (!showId) {
+      setSeats([]);
+      setSelected([]);
+      return;
+    }
+
+    api
+      .seats(showId)
+      .then(setSeats)
+      .catch(e => {
+        console.error("seats error:", e);
+        setMsg("Failed to load seats: " + e.message);
+      });
+  }, [showId]);
+
+  // Find currently selected showtime object for convenience
+  const currentShow = useMemo(
+    () =>
+      data?.showtimes?.find(s => String(s.id) === String(showId)) || null,
     [data, showId]
   );
 
-  async function book() {
+  // ===== Handle booking submission =====
+  async function handleBook(e) {
+    e.preventDefault();
     setMsg("");
-    setMsgType("");
-    if (!showId || !qty) {
-      setMsg("Please select a showtime and number of tickets");
-      setMsgType("error");
+
+    // Basic validation: must have showtime + at least one seat
+    if (!showId || selected.length === 0) {
+      setMsg("Select showtime and at least one seat.");
       return;
     }
 
@@ -123,20 +188,14 @@ export default function Movie() {
   const posterUrl = data.movie.poster_url || null;
 
   return (
-    <div>
-      <button
-        onClick={() => navigate("/")}
+    <div className="movie-page">
+      {/* Movie poster + basic info */}
+      <div
         style={{
-          marginBottom: "24px",
-          padding: "8px 16px",
-          background: "transparent",
-          color: "#e50914",
-          border: "2px solid #e50914",
-          borderRadius: "4px",
-          cursor: "pointer",
-          fontSize: "14px",
-          fontWeight: "600",
-          transition: "all 0.3s ease",
+          display: "flex",
+          gap: 20,
+          marginBottom: 20,
+          flexWrap: "wrap"
         }}
       >
         ← Back to Movies
@@ -213,89 +272,119 @@ export default function Movie() {
           </div>
         </div>
 
-        {data.showtimes && data.showtimes.length > 0 && (
-          <div className="booking-section">
-            <h3>Book Your Tickets</h3>
+      {/* Booking form: showtime, ticket type, user details, seats */}
+      <form
+        onSubmit={handleBook}
+        style={{ marginTop: 16, display: "grid", gap: 12, maxWidth: 420 }}
+      >
+        {/* Showtime selector */}
+        <label>
+          Showtime:
+          <select
+            value={showId}
+            onChange={e => setShowId(e.target.value)}
+            style={{ marginTop: 4 }}
+          >
+            <option value="">Select showtime</option>
+            {showtimes.map(st => {
+              // Convert date/time fields to readable string
+              const dt = st.start_time
+                ? new Date(st.start_time)
+                : st.show_date
+                ? new Date(st.show_date)
+                : null;
 
-            <form className="booking-form">
-              <div className="form-group">
-                <label>Select Showtime *</label>
-                <select value={showId} onChange={e => setShowId(e.target.value)}>
-                  <option value="">Choose a showtime</option>
-                  {data.showtimes.map(s => (
-                    <option value={s.id} key={s.id}>
-                      {new Date(s.start_time).toLocaleString()} — {s.theater_name} — €{getPrice(s).toFixed(2)}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              const parts = [];
+              if (dt) parts.push(dt.toLocaleString());
+              if (st.theater_name) parts.push(st.theater_name);
+              if (st.auditorium_name) parts.push(st.auditorium_name);
+              if (st.price != null)
+                parts.push(`€${Number(st.price).toFixed(2)}`);
 
-              <div className="form-group-row">
-                <div className="form-group">
-                  <label>Number of Tickets *</label>
-                  <input
-                    type="number"
-                    min="1"
-                    max="10"
-                    value={qty}
-                    onChange={e => setQty(e.target.value)}
-                  />
-                  {selectedShow && (
-                    <div className="price-info">
-                      Total: <span className="price">€{(getPrice(selectedShow) * Number(qty)).toFixed(2)}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
+              return (
+                <option key={st.id} value={st.id}>
+                  {parts.join(" — ")}
+                </option>
+              );
+            })}
+          </select>
+        </label>
 
-              <div className="form-group">
-                <label>Full Name</label>
-                <input
-                  type="text"
-                  value={name}
-                  onChange={e => setName(e.target.value)}
-                  placeholder="Your full name (optional)"
-                />
-              </div>
+        {/* Ticket type selector (affects price calculation on backend) */}
+        <label>
+          Ticket type:
+          <select
+            value={ticketType}
+            onChange={e => setTicketType(e.target.value)}
+            style={{ marginTop: 4 }}
+          >
+            <option value="adult">Adult</option>
+            <option value="child">Child</option>
+          </select>
+        </label>
 
-              <div className="form-group">
-                <label>Email Address</label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                  placeholder="your@email.com (optional)"
-                />
-              </div>
+        {/* Authenticated user sees info instead of email form */}
+        {authUser ? (
+          <p style={{ fontSize: 14, color: "#555" }}>
+            Booking as <b>{authUser.email}</b>
+          </p>
+        ) : (
+          // Guest user must enter name/email
+          <>
+            <label>
+              Name:
+              <input
+                value={name}
+                onChange={e => setName(e.target.value)}
+                placeholder="Your name"
+              />
+            </label>
 
-              <button
-                type="button"
-                onClick={book}
-                disabled={!showId || !qty}
-                className="booking-button"
-              >
-                {selectedShow
-                  ? `Book for €${(getPrice(selectedShow) * Number(qty)).toFixed(2)}`
-                  : "Select Showtime to Book"}
-              </button>
+            <label>
+              Email:
+              <input
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                placeholder="you@example.com"
+              />
+            </label>
+          </>
+        )}
 
-              {msg && (
-                <div className={`message ${msgType}`}>
-                  {msg}
-                </div>
-              )}
-            </form>
+        {/* Seat map rendered only after showtime is selected and seats loaded */}
+        {showId && seats.length > 0 && (
+          <div>
+            <h3 style={{ marginTop: 10, marginBottom: 6 }}>Select seats</h3>
+            <SeatMap
+              seats={seats}
+              selected={selected}
+              toggle={seatId => {
+                setSelected(prev =>
+                  prev.includes(seatId)
+                    ? prev.filter(x => x !== seatId)
+                    : [...prev, seatId]
+                );
+              }}
+            />
           </div>
         )}
 
-        {(!data.showtimes || data.showtimes.length === 0) && (
-          <div className="booking-section">
-            <p style={{ color: "#999", textAlign: "center" }}>
-              ℹ️ No showtimes available for this movie
-            </p>
-          </div>
-        )}
-      </div>
+        {/* Submit button, disabled until seats + showtime selected */}
+        <button
+          type="submit"
+          disabled={!showId || selected.length === 0}
+          style={{ marginTop: 8 }}
+        >
+          {selected.length
+            ? `Book ${selected.length} seat${
+                selected.length > 1 ? "s" : ""
+              }`
+            : "Book"}
+        </button>
+      </form>
+
+      {/* Feedback message: errors or success */}
+      {msg && <p style={{ marginTop: 12 }}>{msg}</p>}
     </div>
   );
 }
