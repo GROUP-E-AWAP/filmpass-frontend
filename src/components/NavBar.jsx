@@ -8,24 +8,27 @@ export default function NavBar() {
   return (
     <header>
       {/* Logo + project name section */}
-      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+      <div className="header-logo">
         {/* App logo (static asset) */}
         <img
           src="/north-star-logo.jpg"
           alt="North Star"
-          style={{ height: 40, borderRadius: 6, objectFit: "cover" }}
+          className="logo-image"
+          onError={(e) => {
+            e.target.style.display = 'none';
+          }}
         />
 
         {/* Main navigation link to homepage */}
-        <Link to="/" style={{ textDecoration: "none", color: "black" }}>
+        <Link to="/" className="logo-link">
           <h1>FilmPass</h1>
         </Link>
       </div>
 
       {/* Main navigation section (movies, admin, auth controls) */}
-      <nav style={{ display: "flex", alignItems: "center", gap: 12 }}>
+      <nav>
         {/* Public link to movie list */}
-        <Link to="/">Movies</Link>
+        <Link to="/">Theaters</Link>
 
         {/* Admin link shown only for authenticated users with admin/employee roles */}
         {user && (user.role === "admin" || user.role === "employee") && (

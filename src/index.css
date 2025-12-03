@@ -1,31 +1,42 @@
-/* ===== GLOBAL STYLE ===== */
-/* Base typography, spacing, background */
-body {
+/* ===== GLOBAL RESET & BASE STYLES ===== */
+* {
   margin: 0;
   padding: 0;
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-  background: #f5f6fa;
-  color: #222;
+  box-sizing: border-box;
 }
 
-a {
-  color: #4a4adb;
-  text-decoration: none;
-}
-
-a:hover {
-  text-decoration: underline;
-}
-
-/* ===== LAYOUT WRAPPER ===== */
-/* Centers page content and limits width */
-.container {
+html, body, #root {
+  height: 100%;
   width: 100%;
   margin: 0;
   padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #f5f5f1;
+  color: #221f1f;
+}
+
+a {
+  color: #e50914;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+a:hover {
+  opacity: 0.8;
+}
+
+/* ===== CONTAINER LAYOUT ===== */
+.container {
+  width: 100%;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  background: #f5f5f1;
 }
 
 .container > main {
@@ -35,189 +46,353 @@ a:hover {
   margin: 0;
 }
 
-/* ===== HEADER AREA ===== */
-/* Layout for logo, nav links, and user profile status */
+/* ===== HEADER & NAVIGATION ===== */
 header {
+  background: linear-gradient(135deg, #221f1f 0%, #1a1817 100%);
+  color: white;
+  padding: 16px 32px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px 0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-image {
+  height: 40px;
+  width: 40px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.logo-link {
+  text-decoration: none;
+  color: inherit;
 }
 
 header h1 {
+  font-size: 28px;
+  font-weight: 800;
+  color: #e50914;
   margin: 0;
-  font-size: 32px;
-  color: #222;
+  letter-spacing: -0.5px;
 }
 
-nav a {
-  margin-left: 15px;
+header nav {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+header nav a {
+  color: white;
+  font-weight: 600;
   font-size: 15px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+header nav a:hover {
+  background-color: rgba(229, 9, 20, 0.2);
+  opacity: 1;
 }
 
 nav .username {
-  margin-left: 10px;
   font-size: 14px;
-  color: #555;
+  color: rgba(255, 255, 255, 0.8);
+  padding: 0 8px;
 }
 
-/* ===== MOVIE GRID LIST ===== */
-/* Responsive card layout used on theater and movie lists */
-.movie-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 24px;
-  margin-top: 20px;
+nav .username b {
+  color: white;
 }
 
-.movie-card {
-  background: white;
-  border-radius: 10px;
-  padding: 16px;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.08);
-  transition: 0.15s;
-}
-
-.movie-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 5px 10px rgba(0,0,0,0.12);
-}
-
-.movie-title {
-  margin-bottom: 8px;
-  font-size: 18px;
-  font-weight: 600;
-}
-
-/* ===== FORMS ===== */
-/* Reusable styling for all inputs, selects, and form cards */
-form {
-  background: white;
-  padding: 20px;
-  border-radius: 10px;
-  max-width: 380px;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.08);
-}
-
-form input,
-form select {
-  width: 100%;
-  padding: 8px 10px;
-  margin-top: 6px;
-  margin-bottom: 14px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-}
-
-/* Buttons used throughout the application */
+/* ===== BUTTONS ===== */
 button {
-  padding: 10px 15px;
+  padding: 10px 20px;
   border: none;
-  background: #4a4adb;
+  background: linear-gradient(135deg, #e50914 0%, #c10812 100%);
   color: white;
   font-size: 15px;
+  font-weight: 600;
   border-radius: 6px;
   cursor: pointer;
-  transition: 0.15s;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(229, 9, 20, 0.3);
 }
 
-button:hover {
-  background: #3939c7;
+button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(229, 9, 20, 0.4);
+}
+
+button:active:not(:disabled) {
+  transform: translateY(0);
 }
 
 button:disabled {
-  background: #aaa;
-  cursor: default;
+  background: linear-gradient(135deg, #ccc 0%, #999 100%);
+  cursor: not-allowed;
+  box-shadow: none;
 }
 
-/* ===== MOVIE PAGE LAYOUT ===== */
-/* Contains poster, description, showtime selector, seat map */
-.movie-page {
+/* ===== FORMS ===== */
+form {
   background: white;
-  padding: 24px;
+  padding: 32px;
   border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-  max-width: 700px;
-  margin-top: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  max-width: 460px;
+  margin: 0 auto;
+}
+
+form h2 {
+  margin-bottom: 24px;
+  color: #221f1f;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+form label {
+  display: block;
+  margin-bottom: 20px;
+  font-weight: 600;
+  color: #221f1f;
+}
+
+form input,
+form select,
+form textarea {
+  width: 100%;
+  padding: 12px 16px;
+  margin-top: 6px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 15px;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  background: white;
+}
+
+form input:focus,
+form select:focus,
+form textarea:focus {
+  outline: none;
+  border-color: #e50914;
+  box-shadow: 0 0 0 3px rgba(229, 9, 20, 0.1);
+}
+
+form input:hover,
+form select:hover,
+form textarea:hover {
+  border-color: #bbb;
+}
+
+form button[type="submit"] {
+  width: 100%;
+  padding: 14px;
+  margin-top: 8px;
+  font-size: 16px;
 }
 
 /* ===== FOOTER ===== */
-/* Simple centered footer with separator line */
 footer {
   width: 100%;
   margin-top: auto;
-  padding: 24px 16px;
-  font-size: 13px;
-  color: #6b7280;
-  border-top: 1px solid #e5e7eb;
+  padding: 24px 32px;
+  font-size: 14px;
+  color: #666;
+  border-top: 1px solid #e0e0e0;
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 24px;
+  gap: 32px;
   flex-wrap: wrap;
   background: white;
-  box-shadow: 0 -1px 3px rgba(0,0,0,0.05);
 }
 
 footer span:last-child {
-  opacity: 0.9;
+  opacity: 0.8;
 }
 
-/* ===== RESPONSIVE RULES ===== */
-/* Adjust spacing and layout for tablets and phones */
-@media (max-width: 768px) {
-  header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-    padding: 12px 16px;
-  }
+/* ===== UTILITY CLASSES ===== */
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+}
 
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #e50914;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.message {
+  padding: 16px 20px;
+  border-radius: 8px;
+  margin: 16px 0;
+  font-weight: 600;
+}
+
+.message.error {
+  background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+  border-left: 4px solid #e50914;
+  color: #c62828;
+}
+
+.message.success {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  border-left: 4px solid #4caf50;
+  color: #2e7d32;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #999;
+  font-size: 16px;
+}
+
+.empty-state-text {
+  font-size: 18px;
+  color: #666;
+}
+
+/* ===== RESPONSIVE BREAKPOINTS ===== */
+
+/* Tablets and small desktops (768px - 1024px) */
+@media (max-width: 1024px) {
+  header {
+    padding: 14px 24px;
+  }
+  
   header h1 {
     font-size: 24px;
   }
+  
+  header nav {
+    gap: 16px;
+  }
+  
+  header nav a {
+    font-size: 14px;
+    padding: 6px 12px;
+  }
+}
+
+/* Mobile devices (max-width: 768px) */
+@media (max-width: 768px) {
+  header {
+    padding: 12px 16px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .header-logo {
+    gap: 8px;
+  }
+
+  .logo-image {
+    height: 32px;
+    width: 32px;
+  }
+
+  header h1 {
+    font-size: 22px;
+  }
 
   header nav {
-    margin-top: 4px;
+    gap: 12px;
+    flex-wrap: wrap;
   }
 
   header nav a {
     font-size: 13px;
-    margin-left: 10px;
+    padding: 6px 10px;
   }
 
-  .movie-grid {
-    grid-template-columns: repeat(2, 1fr);
+  nav .username {
+    font-size: 12px;
+    padding: 0 4px;
+  }
+
+  button {
+    padding: 10px 16px;
+    font-size: 14px;
+  }
+
+  form {
+    padding: 24px;
+    max-width: 100%;
+  }
+
+  form h2 {
+    font-size: 20px;
+  }
+
+  footer {
+    padding: 20px 16px;
     gap: 16px;
-  }
-
-  .movie-page {
-    padding: 16px;
+    font-size: 13px;
   }
 }
 
+/* Small mobile devices (max-width: 600px) */
 @media (max-width: 600px) {
   header {
-    padding: 12px;
+    padding: 10px 12px;
+  }
+
+  .header-logo {
+    gap: 6px;
+  }
+
+  .logo-image {
+    height: 28px;
+    width: 28px;
   }
 
   header h1 {
     font-size: 20px;
   }
 
-  nav a {
+  header nav {
+    width: 100%;
+    justify-content: flex-start;
+    gap: 8px;
+  }
+
+  header nav a {
     font-size: 12px;
-    margin-left: 8px;
+    padding: 5px 8px;
   }
 
-  .movie-grid {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-
-  form {
-    max-width: 100%;
-    padding: 16px;
+  nav .username {
+    font-size: 11px;
+    width: 100%;
+    padding: 4px 0;
   }
 
   button {
@@ -225,23 +400,44 @@ footer span:last-child {
     font-size: 14px;
   }
 
+  form {
+    padding: 20px;
+    border-radius: 8px;
+  }
+
+  form input,
+  form select,
+  form textarea {
+    padding: 10px 14px;
+    font-size: 14px;
+  }
+
   footer {
     flex-direction: column;
     align-items: center;
-    gap: 12px;
-    padding: 16px;
+    gap: 8px;
+    padding: 16px 12px;
     font-size: 12px;
   }
 }
 
-/* Full-height layout: footer stays at bottom */
-html, body, #root {
-  height: 100%;
-  width: 100%;
-  margin: 0;
-  padding: 0;
-}
+/* Extra small devices (max-width: 400px) */
+@media (max-width: 400px) {
+  .logo-image {
+    height: 24px;
+    width: 24px;
+  }
 
-body {
-  background: #f5f5f5;
+  header h1 {
+    font-size: 18px;
+  }
+
+  header nav a {
+    font-size: 11px;
+    padding: 4px 6px;
+  }
+
+  button {
+    font-size: 13px;
+  }
 }

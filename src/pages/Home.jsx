@@ -12,11 +12,15 @@ import { api } from "../api";
 export default function Home() {
   const { theaterId } = useParams();
   const [movies, setMovies] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [moviePrices, setMoviePrices] = useState({});
   const [error, setError] = useState("");
 
   // Load movies whenever theaterId changes
   useEffect(() => {
     setLoading(true);
+    setError(""); // Clear previous errors
+    
     api.listMovies()
       .then(movies => {
         setMovies(movies);
@@ -57,71 +61,80 @@ export default function Home() {
             }
           });
           setMoviePrices(prices);
+          setLoading(false);
         });
       })
       .catch(e => {
         console.error("Failed to load movies", e);
         setError("Failed to load movies");
+        setLoading(false);
       });
   }, [theaterId]);
 
   return (
-    <div>
-      <h2>Movies</h2>
+    <div className="movies-page">
+      <h2 className="page-title">Now Showing</h2>
 
       {/* Display error if theater is missing or API failed */}
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {error && <div className="error-message">{error}</div>}
+
+      {/* Loading state */}
+      {loading && <div className="loading-message">Loading movies...</div>}
 
       <div className="movie-grid">
         {movies.map(m => (
-          <div className="movie-card" key={m.id}>
-            {/* Movie poster (if provided) */}
-            {m.poster_url && (
-              <img
-                src={m.poster_url}
-                alt={m.title}
-                style={{
-                  width: "100%",
-                  borderRadius: 8,
-                  marginBottom: 10,
-                  objectFit: "cover",
-                  maxHeight: 260
-                }}
-              />
-            )}
+          <Link
+            key={m.id}
+            to={`/movie/${m.id}${theaterId ? `?theaterId=${encodeURIComponent(theaterId)}` : ''}`}
+            className="movie-card-link"
+          >
+            <div className="movie-card">
+              <div className="movie-poster">
+                {m.poster_url ? (
+                  <img src={m.poster_url} alt={m.title} />
+                ) : (
+                  <div className="poster-placeholder">
+                    <span className="poster-placeholder-icon">🎬</span>
+                  </div>
+                )}
+                {moviePrices[m.id] && (
+                  <div className="movie-price-badge">
+                    €{moviePrices[m.id].toFixed(2)}
+                  </div>
+                )}
+              </div>
 
-            {/* Movie title */}
-            <div className="movie-title">{m.title}</div>
+              <div className="movie-card-content">
+                <h3 className="movie-card-title">{m.title}</h3>
+                
+                <div className="movie-card-meta">
+                  {m.genre && (
+                    <span className="meta-genre">{m.genre}</span>
+                  )}
+                  {m.duration_minutes && (
+                    <span className="meta-duration">⏱ {m.duration_minutes}m</span>
+                  )}
+                </div>
 
-            {/* Short description snippet */}
-            <div
-              style={{
-                fontSize: 14,
-                opacity: 0.7,
-                marginBottom: 10,
-                minHeight: 40
-              }}
-            >
-              {m.description
-                ? m.description.slice(0, 80) +
-                  (m.description.length > 80 ? "…" : "")
-                : "No description yet"}
+                <p className="movie-card-description">
+                  {m.description
+                    ? m.description.slice(0, 100) + (m.description.length > 100 ? "..." : "")
+                    : "No description available"}
+                </p>
+
+                <button className="movie-card-btn">
+                  Book Tickets
+                </button>
+              </div>
             </div>
-
-            {/* Link to movie details page, preserving theaterId in query */}
-            <Link
-              to={`/movie/${m.id}?theaterId=${encodeURIComponent(theaterId)}`}
-            >
-              <button type="button">View details</button>
-            </Link>
-          </div>
+          </Link>
         ))}
-
-        {/* No movies for this theater, but also no error */}
-        {movies.length === 0 && !error && (
-          <p style={{ marginTop: 10 }}>No movies found for this theater.</p>
-        )}
       </div>
+
+      {/* No movies for this theater, but also no error */}
+      {!loading && movies.length === 0 && !error && (
+        <div className="empty-state">No movies found for this theater.</div>
+      )}
     </div>
   );
 }

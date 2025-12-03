@@ -80,6 +80,8 @@ export const api = {
 
   seats: showId => fetchJSON(`/showtimes/${showId}/seats`),
 
+  getShowtimes: movieId => fetchJSON(`/movies/${movieId}/showtimes`),
+
   createBooking: payload =>
     fetchJSON(`/bookings`, {
       method: "POST",

@@ -13,55 +13,55 @@ import { api } from "../api";
  */
 export default function Theaters() {
   const [theaters, setTheaters] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   // Load all theaters on initial render
   useEffect(() => {
+    setLoading(true);
     api
       .listTheaters()
       .then(data => {
         setTheaters(data);
+        setLoading(false);
       })
       .catch(e => {
         console.error("Failed to load theaters", e);
         setError("Failed to load theaters");
+        setLoading(false);
       });
   }, []);
 
   return (
-    <div>
-      <h2>Choose a Theater</h2>
+    <div className="theaters-page">
+      <h2 className="page-title">Choose Your Theater</h2>
 
       {/* API load error message */}
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {error && <div className="error-message">{error}</div>}
 
-      {/* No theaters in DB */}
-      {theaters.length === 0 && !error && <p>No theaters found.</p>}
+      {/* Loading state */}
+      {loading && <div className="loading-message">Loading theaters...</div>}
 
-      {/* Theater list rendered as cards (reuse movie-card grid style) */}
-      <div className="movie-grid">
+      {/* Theater grid */}
+      <div className="theater-grid">
         {theaters.map(t => (
-          <div className="movie-card" key={t.id}>
-            <div className="movie-title">{t.name}</div>
-
-            <div
-              style={{
-                fontSize: 14,
-                opacity: 0.8,
-                marginBottom: 10,
-                minHeight: 30
-              }}
-            >
-              {t.location}
+          <Link to={`/theater/${t.id}`} key={t.id} className="theater-card-link">
+            <div className="theater-card">
+              <div className="theater-icon">🎭</div>
+              <h3 className="theater-name">{t.name}</h3>
+              <p className="theater-location">{t.location}</p>
+              <button type="button" className="theater-btn">
+                View Movies
+              </button>
             </div>
-
-            {/* Link to the movie list for this theater */}
-            <Link to={`/theater/${t.id}`}>
-              <button type="button">View movies</button>
-            </Link>
-          </div>
+          </Link>
         ))}
       </div>
+
+      {/* No theaters in DB */}
+      {!loading && theaters.length === 0 && !error && (
+        <div className="empty-state">No theaters available at the moment.</div>
+      )}
     </div>
   );
 }

@@ -31,68 +31,65 @@ export default function SeatMap({ seats, selected, toggle }) {
   );
 
   return (
-    <div
-      style={{
-        display: "grid",
-        gap: 8,
-        marginTop: 12,
-        padding: 12,
-        border: "1px solid #ddd",
-        borderRadius: 8
-      }}
-    >
-      {/* Render each row alphabetically */}
-      {Object.keys(byRow)
-        .sort()
-        .map(row => (
-          <div
-            key={row}
-            style={{ display: "flex", gap: 6, alignItems: "center" }}
-          >
-            {/* Row label (A, B, C...) */}
-            <div style={{ width: 20, textAlign: "center", fontWeight: 500 }}>
-              {row}
+    <div className="seat-map-container">
+      {/* Screen indicator */}
+      <div className="screen-indicator">
+        <div className="screen-line"></div>
+        <span className="screen-text">SCREEN</span>
+      </div>
+
+      {/* Seat grid */}
+      <div className="seat-grid">
+        {/* Render each row alphabetically */}
+        {Object.keys(byRow)
+          .sort()
+          .map(row => (
+            <div key={row} className="seat-row">
+              {/* Row label (A, B, C...) */}
+              <div className="row-label">{row}</div>
+
+              {/* Render all seats in the row */}
+              <div className="row-seats">
+                {byRow[row].map(seat => {
+                  const isSelected = selected.includes(seat.id);
+                  const isBooked = seat.status === "BOOKED";
+
+                  return (
+                    <button
+                      key={seat.id}
+                      type="button"
+                      onClick={() => !isBooked && toggle(seat.id)}
+                      className={`seat-button ${
+                        isBooked ? "seat-booked" : isSelected ? "seat-selected" : "seat-available"
+                      }`}
+                      disabled={isBooked}
+                      title={`${seat.row_label}${seat.seat_number} ${
+                        isBooked ? "(booked)" : ""
+                      }`}
+                    >
+                      {seat.seat_number}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-
-            {/* Render all seats in the row */}
-            {byRow[row].map(seat => {
-              const isSelected = selected.includes(seat.id);
-              const isBooked = seat.status === "BOOKED";
-
-              return (
-                <button
-                  key={seat.id}
-                  type="button" // prevent accidental form submission
-                  onClick={() => !isBooked && toggle(seat.id)}
-                  style={{
-                    width: 28,
-                    height: 28,
-                    borderRadius: 4,
-                    border: "1px solid #ccc",
-                    background: isBooked
-                      ? "#999"         // booked seat
-                      : isSelected
-                      ? "#4ade80"       // selected seat
-                      : "#fff",         // available seat
-                    cursor: isBooked ? "not-allowed" : "pointer",
-                    fontSize: 12
-                  }}
-                  title={`${seat.row_label}${seat.seat_number} ${
-                    isBooked ? "(booked)" : ""
-                  }`}
-                >
-                  {seat.seat_number}
-                </button>
-              );
-            })}
-          </div>
-        ))}
+          ))}
+      </div>
 
       {/* Legend */}
-      <div style={{ fontSize: 12, color: "#555", marginTop: 4 }}>
-        <span style={{ marginRight: 12 }}>□ free</span>
-        <span style={{ marginRight: 12 }}>■ selected</span>
-        <span>■ booked</span>
+      <div className="seat-legend">
+        <div className="legend-item">
+          <div className="legend-box legend-available"></div>
+          <span>Available</span>
+        </div>
+        <div className="legend-item">
+          <div className="legend-box legend-selected"></div>
+          <span>Selected</span>
+        </div>
+        <div className="legend-item">
+          <div className="legend-box legend-booked"></div>
+          <span>Booked</span>
+        </div>
       </div>
     </div>
   );
