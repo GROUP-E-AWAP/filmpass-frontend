@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { api } from "../api";
+import SearchBar from "../components/SearchBar.jsx";
 
 /**
  * Home page for customers.
@@ -15,12 +16,13 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [moviePrices, setMoviePrices] = useState({});
   const [error, setError] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Load movies whenever theaterId changes
   useEffect(() => {
     setLoading(true);
     setError(""); // Clear previous errors
-    
+
     api.listMovies()
       .then(movies => {
         setMovies(movies);
@@ -71,9 +73,28 @@ export default function Home() {
       });
   }, [theaterId]);
 
+  // Filter movies based on search query
+  const filteredMovies = movies.filter(movie => {
+    if (!searchQuery) return true;
+
+    const query = searchQuery.toLowerCase();
+    const title = (movie.title || "").toLowerCase();
+    const genre = (movie.genre || "").toLowerCase();
+    const description = (movie.description || "").toLowerCase();
+
+    return title.includes(query) || genre.includes(query) || description.includes(query);
+  });
+
   return (
     <div className="movies-page">
       <h2 className="page-title">Now Showing</h2>
+
+      {/* Search Bar */}
+      <SearchBar
+        value={searchQuery}
+        onChange={setSearchQuery}
+        placeholder="Search movies by title, genre, or description..."
+      />
 
       {/* Display error if theater is missing or API failed */}
       {error && <div className="error-message">{error}</div>}
@@ -82,7 +103,7 @@ export default function Home() {
       {loading && <div className="loading-message">Loading movies...</div>}
 
       <div className="movie-grid">
-        {movies.map(m => (
+        {filteredMovies.map(m => (
           <Link
             key={m.id}
             to={`/movie/${m.id}${theaterId ? `?theaterId=${encodeURIComponent(theaterId)}` : ''}`}
@@ -106,7 +127,7 @@ export default function Home() {
 
               <div className="movie-card-content">
                 <h3 className="movie-card-title">{m.title}</h3>
-                
+
                 <div className="movie-card-meta">
                   {m.genre && (
                     <span className="meta-genre">{m.genre}</span>
@@ -132,8 +153,12 @@ export default function Home() {
       </div>
 
       {/* No movies for this theater, but also no error */}
-      {!loading && movies.length === 0 && !error && (
-        <div className="empty-state">No movies found for this theater.</div>
+      {!loading && filteredMovies.length === 0 && !error && (
+        <div className="empty-state">
+          {searchQuery
+            ? `No movies found matching "${searchQuery}"`
+            : "No movies found for this theater."}
+        </div>
       )}
     </div>
   );
