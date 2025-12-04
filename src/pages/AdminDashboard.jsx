@@ -70,45 +70,194 @@ function AdminTheatersTab() {
   }
 
   return (
-    <div>
-      <h3>Theaters</h3>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      {msg && <p style={{ color: "green" }}>{msg}</p>}
+    <div style={{ padding: "20px 0" }}>
+      <h3 style={{ fontSize: "24px", fontWeight: "700", marginBottom: "20px", color: "#221f1f" }}>
+        Theaters
+      </h3>
+
+      {error && (
+        <div style={{
+          background: "linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%)",
+          borderLeft: "4px solid #e50914",
+          color: "#c62828",
+          padding: "16px 20px",
+          borderRadius: "8px",
+          marginBottom: "24px",
+          fontWeight: "600"
+        }}>
+          {error}
+        </div>
+      )}
+
+      {msg && (
+        <div style={{
+          background: "linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%)",
+          borderLeft: "4px solid #4caf50",
+          color: "#2e7d32",
+          padding: "16px 20px",
+          borderRadius: "8px",
+          marginBottom: "24px",
+          fontWeight: "600"
+        }}>
+          {msg}
+        </div>
+      )}
 
       {/* Form: create new theater */}
-      <form
-        onSubmit={handleCreate}
-        style={{ maxWidth: 400, display: "grid", gap: 8, marginBottom: 20 }}
-      >
-        <label>
-          Name
-          <input
-            value={name}
-            onChange={e => setName(e.target.value)}
-            required
-          />
-        </label>
-        <label>
-          Location
-          <input
-            value={location}
-            onChange={e => setLocation(e.target.value)}
-            required
-          />
-        </label>
-        <button type="submit">Add theater</button>
-      </form>
+      <div style={{
+        background: "white",
+        borderRadius: "12px",
+        padding: "24px",
+        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
+        marginBottom: "32px"
+      }}>
+        <h4 style={{ fontSize: "18px", fontWeight: "700", marginBottom: "16px", color: "#221f1f" }}>
+          Add New Theater
+        </h4>
+        <form
+          onSubmit={handleCreate}
+          style={{ display: "grid", gap: "16px" }}
+        >
+          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+            <label style={{ fontSize: "14px", fontWeight: "600", color: "#221f1f" }}>
+              Theater Name
+            </label>
+            <input
+              value={name}
+              onChange={e => setName(e.target.value)}
+              required
+              style={{
+                padding: "12px 16px",
+                border: "2px solid #e0e0e0",
+                borderRadius: "8px",
+                fontSize: "15px",
+                fontFamily: "inherit",
+                transition: "all 0.3s ease"
+              }}
+              onFocus={(e) => e.target.style.borderColor = "#e50914"}
+              onBlur={(e) => e.target.style.borderColor = "#e0e0e0"}
+            />
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+            <label style={{ fontSize: "14px", fontWeight: "600", color: "#221f1f" }}>
+              Location
+            </label>
+            <input
+              value={location}
+              onChange={e => setLocation(e.target.value)}
+              required
+              style={{
+                padding: "12px 16px",
+                border: "2px solid #e0e0e0",
+                borderRadius: "8px",
+                fontSize: "15px",
+                fontFamily: "inherit",
+                transition: "all 0.3s ease"
+              }}
+              onFocus={(e) => e.target.style.borderColor = "#e50914"}
+              onBlur={(e) => e.target.style.borderColor = "#e0e0e0"}
+            />
+          </div>
+          <button
+            type="submit"
+            style={{
+              padding: "12px 24px",
+              background: "linear-gradient(135deg, #221f1f 0%, #1a1817 100%)",
+              color: "white",
+              border: "none",
+              borderRadius: "8px",
+              fontSize: "15px",
+              fontWeight: "700",
+              cursor: "pointer",
+              transition: "all 0.3s ease",
+              textTransform: "uppercase",
+              letterSpacing: "0.5px"
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.background = "linear-gradient(135deg, #e50914 0%, #c10812 100%)";
+              e.target.style.transform = "translateY(-2px)";
+              e.target.style.boxShadow = "0 6px 20px rgba(229, 9, 20, 0.3)";
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.background = "linear-gradient(135deg, #221f1f 0%, #1a1817 100%)";
+              e.target.style.transform = "translateY(0)";
+              e.target.style.boxShadow = "none";
+            }}
+          >
+            Add Theater
+          </button>
+        </form>
+      </div>
 
       {/* List of existing theaters */}
-      <h4>Existing theaters</h4>
-      <ul>
-        {theaters.map(t => (
-          <li key={t.id}>
-            <b>{t.name}</b> — {t.location}
-          </li>
-        ))}
-        {theaters.length === 0 && <li>No theaters yet.</li>}
-      </ul>
+      <h4 style={{ fontSize: "20px", fontWeight: "700", marginBottom: "16px", color: "#221f1f" }}>
+        Existing Theaters
+      </h4>
+
+      {theaters.length === 0 ? (
+        <div style={{
+          textAlign: "center",
+          padding: "40px 20px",
+          color: "#666",
+          fontSize: "16px",
+          background: "white",
+          borderRadius: "12px",
+          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)"
+        }}>
+          No theaters yet. Add your first theater above.
+        </div>
+      ) : (
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
+          gap: "20px"
+        }}>
+          {theaters.map(t => (
+            <div
+              key={t.id}
+              style={{
+                background: "white",
+                borderRadius: "12px",
+                padding: "24px",
+                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
+                border: "2px solid transparent",
+                transition: "all 0.3s ease"
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "translateY(-4px)";
+                e.currentTarget.style.boxShadow = "0 12px 24px rgba(0, 0, 0, 0.12)";
+                e.currentTarget.style.borderColor = "#e50914";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.08)";
+                e.currentTarget.style.borderColor = "transparent";
+              }}
+            >
+              <div style={{ fontSize: "48px", textAlign: "center", marginBottom: "12px" }}>
+                🎭
+              </div>
+              <h5 style={{
+                fontSize: "18px",
+                fontWeight: "700",
+                color: "#221f1f",
+                marginBottom: "8px",
+                textAlign: "center"
+              }}>
+                {t.name}
+              </h5>
+              <p style={{
+                fontSize: "14px",
+                color: "#666",
+                textAlign: "center",
+                margin: 0
+              }}>
+                📍 {t.location}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -181,77 +330,244 @@ function AdminAuditoriumsTab() {
     }
   }
 
+  const inputStyle = {
+    padding: "12px 16px",
+    border: "2px solid #e0e0e0",
+    borderRadius: "8px",
+    fontSize: "15px",
+    fontFamily: "inherit",
+    transition: "all 0.3s ease"
+  };
+
   return (
-    <div>
-      <h3>Auditoriums</h3>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      {msg && <p style={{ color: "green" }}>{msg}</p>}
+    <div style={{ padding: "20px 0" }}>
+      <h3 style={{ fontSize: "24px", fontWeight: "700", marginBottom: "20px", color: "#221f1f" }}>
+        Auditoriums
+      </h3>
 
-      {/* Theater selector for context */}
-      <label>
-        Theater:
-        <select
-          value={selectedTheaterId}
-          onChange={e => setSelectedTheaterId(e.target.value)}
-          style={{ marginLeft: 8 }}
-        >
-          <option value="">Select theater</option>
-          {theaters.map(t => (
-            <option key={t.id} value={t.id}>
-              {t.name}
-            </option>
-          ))}
-        </select>
-      </label>
+      {error && (
+        <div style={{
+          background: "linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%)",
+          borderLeft: "4px solid #e50914",
+          color: "#c62828",
+          padding: "16px 20px",
+          borderRadius: "8px",
+          marginBottom: "24px",
+          fontWeight: "600"
+        }}>
+          {error}
+        </div>
+      )}
 
-      {/* Form: create new auditorium inside selected theater */}
-      <form
-        onSubmit={handleCreate}
-        style={{ maxWidth: 400, display: "grid", gap: 8, marginTop: 16 }}
-      >
-        <label>
-          Name
-          <input
-            value={name}
-            onChange={e => setName(e.target.value)}
-            required
-          />
-        </label>
-        <label>
-          Rows
-          <input
-            type="number"
-            min="1"
-            max="30"
-            value={rows}
-            onChange={e => setRows(e.target.value)}
-          />
-        </label>
-        <label>
-          Seats per row
-          <input
-            type="number"
-            min="1"
-            max="40"
-            value={cols}
-            onChange={e => setCols(e.target.value)}
-          />
-        </label>
-        <button type="submit">Add auditorium</button>
-      </form>
+      {msg && (
+        <div style={{
+          background: "linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%)",
+          borderLeft: "4px solid #4caf50",
+          color: "#2e7d32",
+          padding: "16px 20px",
+          borderRadius: "8px",
+          marginBottom: "24px",
+          fontWeight: "600"
+        }}>
+          {msg}
+        </div>
+      )}
 
-      {/* List of existing auditoriums for current theater */}
-      <h4 style={{ marginTop: 16 }}>Existing auditoriums</h4>
-      <ul>
-        {auditoriums.map(a => (
-          <li key={a.id}>
-            <b>{a.name}</b> — {a.seat_rows} rows × {a.seat_cols} seats
-          </li>
-        ))}
-        {selectedTheaterId && auditoriums.length === 0 && (
-          <li>No auditoriums yet.</li>
-        )}
-      </ul>
+      {/* Theater selector */}
+      <div style={{
+        background: "white",
+        borderRadius: "12px",
+        padding: "20px",
+        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
+        marginBottom: "24px"
+      }}>
+        <label style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+          <span style={{ fontSize: "14px", fontWeight: "600", color: "#221f1f" }}>
+            Select Theater
+          </span>
+          <select
+            value={selectedTheaterId}
+            onChange={e => setSelectedTheaterId(e.target.value)}
+            style={{
+              ...inputStyle,
+              cursor: "pointer"
+            }}
+            onFocus={(e) => e.target.style.borderColor = "#e50914"}
+            onBlur={(e) => e.target.style.borderColor = "#e0e0e0"}
+          >
+            <option value="">Choose a theater...</option>
+            {theaters.map(t => (
+              <option key={t.id} value={t.id}>
+                {t.name}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+
+      {/* Form: create new auditorium */}
+      {selectedTheaterId && (
+        <div style={{
+          background: "white",
+          borderRadius: "12px",
+          padding: "24px",
+          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
+          marginBottom: "32px"
+        }}>
+          <h4 style={{ fontSize: "18px", fontWeight: "700", marginBottom: "16px", color: "#221f1f" }}>
+            Add New Auditorium
+          </h4>
+          <form onSubmit={handleCreate} style={{ display: "grid", gap: "16px" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              <label style={{ fontSize: "14px", fontWeight: "600", color: "#221f1f" }}>
+                Auditorium Name
+              </label>
+              <input
+                value={name}
+                onChange={e => setName(e.target.value)}
+                required
+                style={inputStyle}
+                onFocus={(e) => e.target.style.borderColor = "#e50914"}
+                onBlur={(e) => e.target.style.borderColor = "#e0e0e0"}
+              />
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                <label style={{ fontSize: "14px", fontWeight: "600", color: "#221f1f" }}>
+                  Rows
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  max="30"
+                  value={rows}
+                  onChange={e => setRows(e.target.value)}
+                  style={inputStyle}
+                  onFocus={(e) => e.target.style.borderColor = "#e50914"}
+                  onBlur={(e) => e.target.style.borderColor = "#e0e0e0"}
+                />
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                <label style={{ fontSize: "14px", fontWeight: "600", color: "#221f1f" }}>
+                  Seats per Row
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  max="40"
+                  value={cols}
+                  onChange={e => setCols(e.target.value)}
+                  style={inputStyle}
+                  onFocus={(e) => e.target.style.borderColor = "#e50914"}
+                  onBlur={(e) => e.target.style.borderColor = "#e0e0e0"}
+                />
+              </div>
+            </div>
+            <button
+              type="submit"
+              style={{
+                padding: "12px 24px",
+                background: "linear-gradient(135deg, #221f1f 0%, #1a1817 100%)",
+                color: "white",
+                border: "none",
+                borderRadius: "8px",
+                fontSize: "15px",
+                fontWeight: "700",
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+                textTransform: "uppercase",
+                letterSpacing: "0.5px"
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.background = "linear-gradient(135deg, #e50914 0%, #c10812 100%)";
+                e.target.style.transform = "translateY(-2px)";
+                e.target.style.boxShadow = "0 6px 20px rgba(229, 9, 20, 0.3)";
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.background = "linear-gradient(135deg, #221f1f 0%, #1a1817 100%)";
+                e.target.style.transform = "translateY(0)";
+                e.target.style.boxShadow = "none";
+              }}
+            >
+              Add Auditorium
+            </button>
+          </form>
+        </div>
+      )}
+
+      {/* List of existing auditoriums */}
+      {selectedTheaterId && (
+        <>
+          <h4 style={{ fontSize: "20px", fontWeight: "700", marginBottom: "16px", color: "#221f1f" }}>
+            Existing Auditoriums
+          </h4>
+
+          {auditoriums.length === 0 ? (
+            <div style={{
+              textAlign: "center",
+              padding: "40px 20px",
+              color: "#666",
+              fontSize: "16px",
+              background: "white",
+              borderRadius: "12px",
+              boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)"
+            }}>
+              No auditoriums yet. Add your first auditorium above.
+            </div>
+          ) : (
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+              gap: "16px"
+            }}>
+              {auditoriums.map(a => (
+                <div
+                  key={a.id}
+                  style={{
+                    background: "white",
+                    borderRadius: "12px",
+                    padding: "20px",
+                    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
+                    border: "2px solid transparent",
+                    transition: "all 0.3s ease"
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = "translateY(-4px)";
+                    e.currentTarget.style.boxShadow = "0 12px 24px rgba(0, 0, 0, 0.12)";
+                    e.currentTarget.style.borderColor = "#e50914";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = "translateY(0)";
+                    e.currentTarget.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.08)";
+                    e.currentTarget.style.borderColor = "transparent";
+                  }}
+                >
+                  <div style={{ fontSize: "36px", textAlign: "center", marginBottom: "12px" }}>
+                    🎬
+                  </div>
+                  <h5 style={{
+                    fontSize: "16px",
+                    fontWeight: "700",
+                    color: "#221f1f",
+                    marginBottom: "8px",
+                    textAlign: "center"
+                  }}>
+                    {a.name}
+                  </h5>
+                  <p style={{
+                    fontSize: "14px",
+                    color: "#666",
+                    textAlign: "center",
+                    margin: 0
+                  }}>
+                    {a.seat_rows} rows × {a.seat_cols} seats
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }
@@ -378,150 +694,180 @@ function AdminShowtimesTab() {
     }
   }
 
+  const inputStyle = {
+    padding: "12px 16px",
+    border: "2px solid #e0e0e0",
+    borderRadius: "8px",
+    fontSize: "15px",
+    fontFamily: "inherit",
+    transition: "all 0.3s ease"
+  };
+
+  const buttonStyle = {
+    padding: "12px 24px",
+    background: "linear-gradient(135deg, #221f1f 0%, #1a1817 100%)",
+    color: "white",
+    border: "none",
+    borderRadius: "8px",
+    fontSize: "15px",
+    fontWeight: "700",
+    cursor: "pointer",
+    transition: "all 0.3s ease",
+    textTransform: "uppercase",
+    letterSpacing: "0.5px"
+  };
+
   return (
-    <div>
-      <h3>Movies & showtimes</h3>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      {msg && <p style={{ color: "green" }}>{msg}</p>}
+    <div style={{ padding: "20px 0" }}>
+      <h3 style={{ fontSize: "24px", fontWeight: "700", marginBottom: "20px", color: "#221f1f" }}>
+        Movies & Showtimes
+      </h3>
 
-      {/* Block: create a new movie */}
-      <h4>Create movie</h4>
-      <form
-        onSubmit={handleCreateMovie}
-        style={{ maxWidth: 500, display: "grid", gap: 8, marginBottom: 20 }}
-      >
-        <label>
-          Title
-          <input
-            value={newMovieTitle}
-            onChange={e => setNewMovieTitle(e.target.value)}
-            required
-          />
-        </label>
-        <label>
-          Genre
-          <input
-            value={newMovieGenre}
-            onChange={e => setNewMovieGenre(e.target.value)}
-          />
-        </label>
-        <label>
-          Duration (minutes)
-          <input
-            type="number"
-            min="1"
-            value={newMovieDuration}
-            onChange={e => setNewMovieDuration(e.target.value)}
-          />
-        </label>
-        <label>
-          Poster URL
-          <input
-            value={newMoviePoster}
-            onChange={e => setNewMoviePoster(e.target.value)}
-          />
-        </label>
-        <label>
-          Description
-          <textarea
-            value={newMovieDesc}
-            onChange={e => setNewMovieDesc(e.target.value)}
-            rows={3}
-          />
-        </label>
-        <button type="submit">Add movie</button>
-      </form>
+      {error && (
+        <div style={{
+          background: "linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%)",
+          borderLeft: "4px solid #e50914",
+          color: "#c62828",
+          padding: "16px 20px",
+          borderRadius: "8px",
+          marginBottom: "24px",
+          fontWeight: "600"
+        }}>
+          {error}
+        </div>
+      )}
 
-      {/* Block: create a new showtime */}
-      <h4>Create showtime</h4>
-      <form
-        onSubmit={handleCreateShowtime}
-        style={{ maxWidth: 500, display: "grid", gap: 8 }}
-      >
-        <label>
-          Theater
-          <select
-            value={theaterId}
-            onChange={e => setTheaterId(e.target.value)}
-            required
-          >
-            <option value="">Select theater</option>
-            {theaters.map(t => (
-              <option key={t.id} value={t.id}>
-                {t.name}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label>
-          Auditorium
-          <select
-            value={auditoriumId}
-            onChange={e => setAuditoriumId(e.target.value)}
-            required
-          >
-            <option value="">Select auditorium</option>
-            {auditoriums.map(a => (
-              <option key={a.id} value={a.id}>
-                {a.name}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label>
-          Movie
-          <select
-            value={movieId}
-            onChange={e => setMovieId(e.target.value)}
-            required
-          >
-            <option value="">Select movie</option>
-            {movies.map(m => (
-              <option key={m.id} value={m.id}>
-                {m.title}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label>
-          Date
-          <input
-            type="date"
-            value={showDate}
-            onChange={e => setShowDate(e.target.value)}
-            required
-          />
-        </label>
-        <label>
-          Start time
-          <input
-            type="time"
-            value={startTime}
-            onChange={e => setStartTime(e.target.value)}
-            required
-          />
-        </label>
-        <label>
-          End time
-          <input
-            type="time"
-            value={endTime}
-            onChange={e => setEndTime(e.target.value)}
-            required
-          />
-        </label>
-        <label>
-          Price
-          <input
-            type="number"
-            step="0.01"
-            min="0"
-            value={price}
-            onChange={e => setPrice(e.target.value)}
-          />
-        </label>
-        <button type="submit">Add showtime</button>
-      </form>
+      {msg && (
+        <div style={{
+          background: "linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%)",
+          borderLeft: "4px solid #4caf50",
+          color: "#2e7d32",
+          padding: "16px 20px",
+          borderRadius: "8px",
+          marginBottom: "24px",
+          fontWeight: "600"
+        }}>
+          {msg}
+        </div>
+      )}
+
+      {/* Create movie form */}
+      <div style={{
+        background: "white",
+        borderRadius: "12px",
+        padding: "24px",
+        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
+        marginBottom: "24px"
+      }}>
+        <h4 style={{ fontSize: "18px", fontWeight: "700", marginBottom: "16px", color: "#221f1f" }}>
+          Create Movie
+        </h4>
+        <form onSubmit={handleCreateMovie} style={{ display: "grid", gap: "16px" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+            <label style={{ fontSize: "14px", fontWeight: "600", color: "#221f1f" }}>Title</label>
+            <input value={newMovieTitle} onChange={e => setNewMovieTitle(e.target.value)} required style={inputStyle}
+              onFocus={(e) => e.target.style.borderColor = "#e50914"} onBlur={(e) => e.target.style.borderColor = "#e0e0e0"} />
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              <label style={{ fontSize: "14px", fontWeight: "600", color: "#221f1f" }}>Genre</label>
+              <input value={newMovieGenre} onChange={e => setNewMovieGenre(e.target.value)} style={inputStyle}
+                onFocus={(e) => e.target.style.borderColor = "#e50914"} onBlur={(e) => e.target.style.borderColor = "#e0e0e0"} />
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              <label style={{ fontSize: "14px", fontWeight: "600", color: "#221f1f" }}>Duration (min)</label>
+              <input type="number" min="1" value={newMovieDuration} onChange={e => setNewMovieDuration(e.target.value)} style={inputStyle}
+                onFocus={(e) => e.target.style.borderColor = "#e50914"} onBlur={(e) => e.target.style.borderColor = "#e0e0e0"} />
+            </div>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+            <label style={{ fontSize: "14px", fontWeight: "600", color: "#221f1f" }}>Poster URL</label>
+            <input value={newMoviePoster} onChange={e => setNewMoviePoster(e.target.value)} style={inputStyle}
+              onFocus={(e) => e.target.style.borderColor = "#e50914"} onBlur={(e) => e.target.style.borderColor = "#e0e0e0"} />
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+            <label style={{ fontSize: "14px", fontWeight: "600", color: "#221f1f" }}>Description</label>
+            <textarea value={newMovieDesc} onChange={e => setNewMovieDesc(e.target.value)} rows={3}
+              style={{ ...inputStyle, resize: "vertical" }}
+              onFocus={(e) => e.target.style.borderColor = "#e50914"} onBlur={(e) => e.target.style.borderColor = "#e0e0e0"} />
+          </div>
+          <button type="submit" style={buttonStyle}
+            onMouseEnter={(e) => { e.target.style.background = "linear-gradient(135deg, #e50914 0%, #c10812 100%)"; e.target.style.transform = "translateY(-2px)"; e.target.style.boxShadow = "0 6px 20px rgba(229, 9, 20, 0.3)"; }}
+            onMouseLeave={(e) => { e.target.style.background = "linear-gradient(135deg, #221f1f 0%, #1a1817 100%)"; e.target.style.transform = "translateY(0)"; e.target.style.boxShadow = "none"; }}>
+            Add Movie
+          </button>
+        </form>
+      </div>
+
+      {/* Create showtime form */}
+      <div style={{
+        background: "white",
+        borderRadius: "12px",
+        padding: "24px",
+        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)"
+      }}>
+        <h4 style={{ fontSize: "18px", fontWeight: "700", marginBottom: "16px", color: "#221f1f" }}>
+          Create Showtime
+        </h4>
+        <form onSubmit={handleCreateShowtime} style={{ display: "grid", gap: "16px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              <label style={{ fontSize: "14px", fontWeight: "600", color: "#221f1f" }}>Theater</label>
+              <select value={theaterId} onChange={e => setTheaterId(e.target.value)} required
+                style={{ ...inputStyle, cursor: "pointer" }}
+                onFocus={(e) => e.target.style.borderColor = "#e50914"} onBlur={(e) => e.target.style.borderColor = "#e0e0e0"}>
+                <option value="">Select theater</option>
+                {theaters.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+              </select>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              <label style={{ fontSize: "14px", fontWeight: "600", color: "#221f1f" }}>Auditorium</label>
+              <select value={auditoriumId} onChange={e => setAuditoriumId(e.target.value)} required
+                style={{ ...inputStyle, cursor: "pointer" }}
+                onFocus={(e) => e.target.style.borderColor = "#e50914"} onBlur={(e) => e.target.style.borderColor = "#e0e0e0"}>
+                <option value="">Select auditorium</option>
+                {auditoriums.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
+              </select>
+            </div>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+            <label style={{ fontSize: "14px", fontWeight: "600", color: "#221f1f" }}>Movie</label>
+            <select value={movieId} onChange={e => setMovieId(e.target.value)} required
+              style={{ ...inputStyle, cursor: "pointer" }}
+              onFocus={(e) => e.target.style.borderColor = "#e50914"} onBlur={(e) => e.target.style.borderColor = "#e0e0e0"}>
+              <option value="">Select movie</option>
+              {movies.map(m => <option key={m.id} value={m.id}>{m.title}</option>)}
+            </select>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "16px" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              <label style={{ fontSize: "14px", fontWeight: "600", color: "#221f1f" }}>Date</label>
+              <input type="date" value={showDate} onChange={e => setShowDate(e.target.value)} required style={inputStyle}
+                onFocus={(e) => e.target.style.borderColor = "#e50914"} onBlur={(e) => e.target.style.borderColor = "#e0e0e0"} />
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              <label style={{ fontSize: "14px", fontWeight: "600", color: "#221f1f" }}>Start Time</label>
+              <input type="time" value={startTime} onChange={e => setStartTime(e.target.value)} required style={inputStyle}
+                onFocus={(e) => e.target.style.borderColor = "#e50914"} onBlur={(e) => e.target.style.borderColor = "#e0e0e0"} />
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              <label style={{ fontSize: "14px", fontWeight: "600", color: "#221f1f" }}>End Time</label>
+              <input type="time" value={endTime} onChange={e => setEndTime(e.target.value)} required style={inputStyle}
+                onFocus={(e) => e.target.style.borderColor = "#e50914"} onBlur={(e) => e.target.style.borderColor = "#e0e0e0"} />
+            </div>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+            <label style={{ fontSize: "14px", fontWeight: "600", color: "#221f1f" }}>Price ($)</label>
+            <input type="number" step="0.01" min="0" value={price} onChange={e => setPrice(e.target.value)} style={inputStyle}
+              onFocus={(e) => e.target.style.borderColor = "#e50914"} onBlur={(e) => e.target.style.borderColor = "#e0e0e0"} />
+          </div>
+          <button type="submit" style={buttonStyle}
+            onMouseEnter={(e) => { e.target.style.background = "linear-gradient(135deg, #e50914 0%, #c10812 100%)"; e.target.style.transform = "translateY(-2px)"; e.target.style.boxShadow = "0 6px 20px rgba(229, 9, 20, 0.3)"; }}
+            onMouseLeave={(e) => { e.target.style.background = "linear-gradient(135deg, #221f1f 0%, #1a1817 100%)"; e.target.style.transform = "translateY(0)"; e.target.style.boxShadow = "none"; }}>
+            Add Showtime
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
@@ -601,139 +947,192 @@ function AdminEmployeesTab() {
     }
   }
 
+  const inputStyle = {
+    padding: "12px 16px",
+    border: "2px solid #e0e0e0",
+    borderRadius: "8px",
+    fontSize: "15px",
+    fontFamily: "inherit",
+    transition: "all 0.3s ease"
+  };
+
   return (
-    <div>
-      <h3>Employees</h3>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      {msg && <p style={{ color: "green" }}>{msg}</p>}
+    <div style={{ padding: "20px 0" }}>
+      <h3 style={{ fontSize: "24px", fontWeight: "700", marginBottom: "20px", color: "#221f1f" }}>
+        Employees
+      </h3>
+
+      {error && (
+        <div style={{
+          background: "linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%)",
+          borderLeft: "4px solid #e50914",
+          color: "#c62828",
+          padding: "16px 20px",
+          borderRadius: "8px",
+          marginBottom: "24px",
+          fontWeight: "600"
+        }}>
+          {error}
+        </div>
+      )}
+
+      {msg && (
+        <div style={{
+          background: "linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%)",
+          borderLeft: "4px solid #4caf50",
+          color: "#2e7d32",
+          padding: "16px 20px",
+          borderRadius: "8px",
+          marginBottom: "24px",
+          fontWeight: "600"
+        }}>
+          {msg}
+        </div>
+      )}
 
       {/* Form: create new employee/admin */}
-      <form
-        onSubmit={handleCreate}
-        style={{ maxWidth: 400, display: "grid", gap: 8, marginBottom: 20 }}
-      >
-        <label>
-          Name
-          <input
-            value={name}
-            onChange={e => setName(e.target.value)}
-            required
-          />
-        </label>
-        <label>
-          Email
-          <input
-            type="email"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            required
-          />
-        </label>
-        <label>
-          Password
-          <input
-            type="password"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            required
-          />
-        </label>
-        <label>
-          Theater
-          <select
-            value={theaterId}
-            onChange={e => setTheaterId(e.target.value)}
-            required
-          >
-            <option value="">Select theater</option>
-            {theaters.map(t => (
-              <option key={t.id} value={t.id}>
-                {t.name}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label>
-          Role
-          <select value={role} onChange={e => setRole(e.target.value)}>
-            <option value="employee">Employee</option>
-            <option value="admin">Admin</option>
-          </select>
-        </label>
-        <button type="submit">Add employee</button>
-      </form>
+      <div style={{
+        background: "white",
+        borderRadius: "12px",
+        padding: "24px",
+        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
+        marginBottom: "32px"
+      }}>
+        <h4 style={{ fontSize: "18px", fontWeight: "700", marginBottom: "16px", color: "#221f1f" }}>
+          Add New Employee
+        </h4>
+        <form onSubmit={handleCreate} style={{ display: "grid", gap: "16px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              <label style={{ fontSize: "14px", fontWeight: "600", color: "#221f1f" }}>Name</label>
+              <input value={name} onChange={e => setName(e.target.value)} required style={inputStyle}
+                onFocus={(e) => e.target.style.borderColor = "#e50914"} onBlur={(e) => e.target.style.borderColor = "#e0e0e0"} />
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              <label style={{ fontSize: "14px", fontWeight: "600", color: "#221f1f" }}>Email</label>
+              <input type="email" value={email} onChange={e => setEmail(e.target.value)} required style={inputStyle}
+                onFocus={(e) => e.target.style.borderColor = "#e50914"} onBlur={(e) => e.target.style.borderColor = "#e0e0e0"} />
+            </div>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+            <label style={{ fontSize: "14px", fontWeight: "600", color: "#221f1f" }}>Password</label>
+            <input type="password" value={password} onChange={e => setPassword(e.target.value)} required style={inputStyle}
+              onFocus={(e) => e.target.style.borderColor = "#e50914"} onBlur={(e) => e.target.style.borderColor = "#e0e0e0"} />
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "16px" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              <label style={{ fontSize: "14px", fontWeight: "600", color: "#221f1f" }}>Theater</label>
+              <select value={theaterId} onChange={e => setTheaterId(e.target.value)} required
+                style={{ ...inputStyle, cursor: "pointer" }}
+                onFocus={(e) => e.target.style.borderColor = "#e50914"} onBlur={(e) => e.target.style.borderColor = "#e0e0e0"}>
+                <option value="">Select theater</option>
+                {theaters.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+              </select>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              <label style={{ fontSize: "14px", fontWeight: "600", color: "#221f1f" }}>Role</label>
+              <select value={role} onChange={e => setRole(e.target.value)}
+                style={{ ...inputStyle, cursor: "pointer" }}
+                onFocus={(e) => e.target.style.borderColor = "#e50914"} onBlur={(e) => e.target.style.borderColor = "#e0e0e0"}>
+                <option value="employee">Employee</option>
+                <option value="admin">Admin</option>
+              </select>
+            </div>
+          </div>
+          <button type="submit" style={{
+            padding: "12px 24px",
+            background: "linear-gradient(135deg, #221f1f 0%, #1a1817 100%)",
+            color: "white",
+            border: "none",
+            borderRadius: "8px",
+            fontSize: "15px",
+            fontWeight: "700",
+            cursor: "pointer",
+            transition: "all 0.3s ease",
+            textTransform: "uppercase",
+            letterSpacing: "0.5px"
+          }}
+            onMouseEnter={(e) => { e.target.style.background = "linear-gradient(135deg, #e50914 0%, #c10812 100%)"; e.target.style.transform = "translateY(-2px)"; e.target.style.boxShadow = "0 6px 20px rgba(229, 9, 20, 0.3)"; }}
+            onMouseLeave={(e) => { e.target.style.background = "linear-gradient(135deg, #221f1f 0%, #1a1817 100%)"; e.target.style.transform = "translateY(0)"; e.target.style.boxShadow = "none"; }}>
+            Add Employee
+          </button>
+        </form>
+      </div>
 
       {/* Employees table */}
-      <h4>Existing employees</h4>
-      <table
-        style={{ borderCollapse: "collapse", width: "100%", maxWidth: 700 }}
-      >
-        <thead>
-          <tr>
-            <th
-              style={{
-                borderBottom: "1px solid #ddd",
-                textAlign: "left",
-                padding: 4
-              }}
-            >
-              Name
-            </th>
-            <th
-              style={{
-                borderBottom: "1px solid #ddd",
-                textAlign: "left",
-                padding: 4
-              }}
-            >
-              Email
-            </th>
-            <th
-              style={{
-                borderBottom: "1px solid #ddd",
-                textAlign: "left",
-                padding: 4
-              }}
-            >
-              Role
-            </th>
-            <th
-              style={{
-                borderBottom: "1px solid #ddd",
-                textAlign: "left",
-                padding: 4
-              }}
-            >
-              Theater
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {employees.map(e => (
-            <tr key={e.id}>
-              <td style={{ borderBottom: "1px solid #eee", padding: 4 }}>
-                {e.name}
-              </td>
-              <td style={{ borderBottom: "1px solid #eee", padding: 4 }}>
-                {e.email}
-              </td>
-              <td style={{ borderBottom: "1px solid #eee", padding: 4 }}>
-                {e.role}
-              </td>
-              <td style={{ borderBottom: "1px solid #eee", padding: 4 }}>
-                {e.theater_name || "—"}
-              </td>
-            </tr>
-          ))}
-          {employees.length === 0 && (
-            <tr>
-              <td colSpan={4} style={{ padding: 4 }}>
-                No employees yet.
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+      <h4 style={{ fontSize: "20px", fontWeight: "700", marginBottom: "16px", color: "#221f1f" }}>
+        Existing Employees
+      </h4>
+
+      {employees.length === 0 ? (
+        <div style={{
+          textAlign: "center",
+          padding: "40px 20px",
+          color: "#666",
+          fontSize: "16px",
+          background: "white",
+          borderRadius: "12px",
+          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)"
+        }}>
+          No employees yet. Add your first employee above.
+        </div>
+      ) : (
+        <div style={{
+          background: "white",
+          borderRadius: "12px",
+          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
+          overflow: "hidden"
+        }}>
+          <table style={{ borderCollapse: "collapse", width: "100%" }}>
+            <thead>
+              <tr style={{ background: "linear-gradient(135deg, #f5f5f1 0%, #e8e8e3 100%)" }}>
+                <th style={{ borderBottom: "2px solid #e0e0e0", textAlign: "left", padding: "16px", fontWeight: "700", color: "#221f1f" }}>
+                  Name
+                </th>
+                <th style={{ borderBottom: "2px solid #e0e0e0", textAlign: "left", padding: "16px", fontWeight: "700", color: "#221f1f" }}>
+                  Email
+                </th>
+                <th style={{ borderBottom: "2px solid #e0e0e0", textAlign: "left", padding: "16px", fontWeight: "700", color: "#221f1f" }}>
+                  Role
+                </th>
+                <th style={{ borderBottom: "2px solid #e0e0e0", textAlign: "left", padding: "16px", fontWeight: "700", color: "#221f1f" }}>
+                  Theater
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {employees.map(e => (
+                <tr key={e.id} style={{ transition: "background 0.2s ease" }}
+                  onMouseEnter={(ev) => ev.currentTarget.style.background = "#f9f9f9"}
+                  onMouseLeave={(ev) => ev.currentTarget.style.background = "white"}>
+                  <td style={{ borderBottom: "1px solid #f0f0f0", padding: "14px 16px", color: "#221f1f" }}>
+                    {e.name}
+                  </td>
+                  <td style={{ borderBottom: "1px solid #f0f0f0", padding: "14px 16px", color: "#666" }}>
+                    {e.email}
+                  </td>
+                  <td style={{ borderBottom: "1px solid #f0f0f0", padding: "14px 16px" }}>
+                    <span style={{
+                      padding: "4px 12px",
+                      background: e.role === "admin" ? "linear-gradient(135deg, #e50914 0%, #c10812 100%)" : "linear-gradient(135deg, #f5f5f1 0%, #e8e8e3 100%)",
+                      color: e.role === "admin" ? "white" : "#221f1f",
+                      borderRadius: "12px",
+                      fontSize: "13px",
+                      fontWeight: "600",
+                      textTransform: "capitalize"
+                    }}>
+                      {e.role}
+                    </span>
+                  </td>
+                  <td style={{ borderBottom: "1px solid #f0f0f0", padding: "14px 16px", color: "#666" }}>
+                    {e.theater_name || "—"}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }
@@ -789,110 +1188,174 @@ function AdminBookingsTab() {
     load();
   }
 
-  return (
-    <div>
-      <h3>Bookings</h3>
-      {error && <p style={{ color: "red" }}>{error}</p>}
+  const inputStyle = {
+    padding: "12px 16px",
+    border: "2px solid #e0e0e0",
+    borderRadius: "8px",
+    fontSize: "15px",
+    fontFamily: "inherit",
+    transition: "all 0.3s ease"
+  };
 
-      {/* Filters: theater + date range */}
-      <form
-        onSubmit={handleSubmit}
-        style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 12 }}
-      >
-        <label>
-          Theater
-          <select
-            value={theaterId}
-            onChange={e => setTheaterId(e.target.value)}
-            style={{ marginLeft: 4 }}
-          >
-            <option value="">All</option>
-            {theaters.map(t => (
-              <option key={t.id} value={t.id}>
-                {t.name}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label>
-          From
-          <input
-            type="date"
-            value={fromDate}
-            onChange={e => setFromDate(e.target.value)}
-            style={{ marginLeft: 4 }}
-          />
-        </label>
-        <label>
-          To
-          <input
-            type="date"
-            value={toDate}
-            onChange={e => setToDate(e.target.value)}
-            style={{ marginLeft: 4 }}
-          />
-        </label>
-        <button type="submit">Filter</button>
-      </form>
+  return (
+    <div style={{ padding: "20px 0" }}>
+      <h3 style={{ fontSize: "24px", fontWeight: "700", marginBottom: "20px", color: "#221f1f" }}>
+        Bookings
+      </h3>
+
+      {error && (
+        <div style={{
+          background: "linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%)",
+          borderLeft: "4px solid #e50914",
+          color: "#c62828",
+          padding: "16px 20px",
+          borderRadius: "8px",
+          marginBottom: "24px",
+          fontWeight: "600"
+        }}>
+          {error}
+        </div>
+      )}
+
+      {/* Filters */}
+      <div style={{
+        background: "white",
+        borderRadius: "12px",
+        padding: "24px",
+        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
+        marginBottom: "32px"
+      }}>
+        <h4 style={{ fontSize: "18px", fontWeight: "700", marginBottom: "16px", color: "#221f1f" }}>
+          Filter Bookings
+        </h4>
+        <form onSubmit={handleSubmit} style={{ display: "grid", gap: "16px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gap: "16px" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              <label style={{ fontSize: "14px", fontWeight: "600", color: "#221f1f" }}>Theater</label>
+              <select value={theaterId} onChange={e => setTheaterId(e.target.value)}
+                style={{ ...inputStyle, cursor: "pointer" }}
+                onFocus={(e) => e.target.style.borderColor = "#e50914"} onBlur={(e) => e.target.style.borderColor = "#e0e0e0"}>
+                <option value="">All Theaters</option>
+                {theaters.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+              </select>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              <label style={{ fontSize: "14px", fontWeight: "600", color: "#221f1f" }}>From Date</label>
+              <input type="date" value={fromDate} onChange={e => setFromDate(e.target.value)} style={inputStyle}
+                onFocus={(e) => e.target.style.borderColor = "#e50914"} onBlur={(e) => e.target.style.borderColor = "#e0e0e0"} />
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              <label style={{ fontSize: "14px", fontWeight: "600", color: "#221f1f" }}>To Date</label>
+              <input type="date" value={toDate} onChange={e => setToDate(e.target.value)} style={inputStyle}
+                onFocus={(e) => e.target.style.borderColor = "#e50914"} onBlur={(e) => e.target.style.borderColor = "#e0e0e0"} />
+            </div>
+          </div>
+          <button type="submit" style={{
+            padding: "12px 24px",
+            background: "linear-gradient(135deg, #221f1f 0%, #1a1817 100%)",
+            color: "white",
+            border: "none",
+            borderRadius: "8px",
+            fontSize: "15px",
+            fontWeight: "700",
+            cursor: "pointer",
+            transition: "all 0.3s ease",
+            textTransform: "uppercase",
+            letterSpacing: "0.5px"
+          }}
+            onMouseEnter={(e) => { e.target.style.background = "linear-gradient(135deg, #e50914 0%, #c10812 100%)"; e.target.style.transform = "translateY(-2px)"; e.target.style.boxShadow = "0 6px 20px rgba(229, 9, 20, 0.3)"; }}
+            onMouseLeave={(e) => { e.target.style.background = "linear-gradient(135deg, #221f1f 0%, #1a1817 100%)"; e.target.style.transform = "translateY(0)"; e.target.style.boxShadow = "none"; }}>
+            Apply Filters
+          </button>
+        </form>
+      </div>
 
       {/* Bookings table */}
-      <table
-        style={{ borderCollapse: "collapse", width: "100%", fontSize: 14 }}
-      >
-        <thead>
-          <tr>
-            <th style={{ borderBottom: "1px solid #ddd", padding: 4 }}>
-              Date
-            </th>
-            <th style={{ borderBottom: "1px solid #ddd", padding: 4 }}>
-              Customer
-            </th>
-            <th style={{ borderBottom: "1px solid #ddd", padding: 4 }}>
-              Movie
-            </th>
-            <th style={{ borderBottom: "1px solid #ddd", padding: 4 }}>
-              Theater
-            </th>
-            <th style={{ borderBottom: "1px solid #ddd", padding: 4 }}>
-              Status
-            </th>
-            <th style={{ borderBottom: "1px solid #ddd", padding: 4 }}>
-              Total €
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {bookings.map(b => (
-            <tr key={b.id}>
-              <td style={{ borderBottom: "1px solid #eee", padding: 4 }}>
-                {new Date(b.created_at).toLocaleString()}
-              </td>
-              <td style={{ borderBottom: "1px solid #eee", padding: 4 }}>
-                {b.customer_email}
-              </td>
-              <td style={{ borderBottom: "1px solid #eee", padding: 4 }}>
-                {b.movie_title}
-              </td>
-              <td style={{ borderBottom: "1px solid #eee", padding: 4 }}>
-                {b.theater_name}
-              </td>
-              <td style={{ borderBottom: "1px solid #eee", padding: 4 }}>
-                {b.status}
-              </td>
-              <td style={{ borderBottom: "1px solid #eee", padding: 4 }}>
-                {Number(b.total_amount).toFixed(2)}
-              </td>
-            </tr>
-          ))}
-          {bookings.length === 0 && (
-            <tr>
-              <td colSpan={6} style={{ padding: 4 }}>
-                No bookings found.
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+      <h4 style={{ fontSize: "20px", fontWeight: "700", marginBottom: "16px", color: "#221f1f" }}>
+        Booking Records
+      </h4>
+
+      {bookings.length === 0 ? (
+        <div style={{
+          textAlign: "center",
+          padding: "40px 20px",
+          color: "#666",
+          fontSize: "16px",
+          background: "white",
+          borderRadius: "12px",
+          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)"
+        }}>
+          No bookings found for the selected filters.
+        </div>
+      ) : (
+        <div style={{
+          background: "white",
+          borderRadius: "12px",
+          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
+          overflow: "hidden"
+        }}>
+          <table style={{ borderCollapse: "collapse", width: "100%", fontSize: "14px" }}>
+            <thead>
+              <tr style={{ background: "linear-gradient(135deg, #f5f5f1 0%, #e8e8e3 100%)" }}>
+                <th style={{ borderBottom: "2px solid #e0e0e0", textAlign: "left", padding: "16px", fontWeight: "700", color: "#221f1f" }}>
+                  Date
+                </th>
+                <th style={{ borderBottom: "2px solid #e0e0e0", textAlign: "left", padding: "16px", fontWeight: "700", color: "#221f1f" }}>
+                  Customer
+                </th>
+                <th style={{ borderBottom: "2px solid #e0e0e0", textAlign: "left", padding: "16px", fontWeight: "700", color: "#221f1f" }}>
+                  Movie
+                </th>
+                <th style={{ borderBottom: "2px solid #e0e0e0", textAlign: "left", padding: "16px", fontWeight: "700", color: "#221f1f" }}>
+                  Theater
+                </th>
+                <th style={{ borderBottom: "2px solid #e0e0e0", textAlign: "left", padding: "16px", fontWeight: "700", color: "#221f1f" }}>
+                  Status
+                </th>
+                <th style={{ borderBottom: "2px solid #e0e0e0", textAlign: "right", padding: "16px", fontWeight: "700", color: "#221f1f" }}>
+                  Total €
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {bookings.map(b => (
+                <tr key={b.id} style={{ transition: "background 0.2s ease" }}
+                  onMouseEnter={(ev) => ev.currentTarget.style.background = "#f9f9f9"}
+                  onMouseLeave={(ev) => ev.currentTarget.style.background = "white"}>
+                  <td style={{ borderBottom: "1px solid #f0f0f0", padding: "14px 16px", color: "#666" }}>
+                    {new Date(b.created_at).toLocaleString()}
+                  </td>
+                  <td style={{ borderBottom: "1px solid #f0f0f0", padding: "14px 16px", color: "#221f1f" }}>
+                    {b.customer_email}
+                  </td>
+                  <td style={{ borderBottom: "1px solid #f0f0f0", padding: "14px 16px", color: "#221f1f" }}>
+                    {b.movie_title}
+                  </td>
+                  <td style={{ borderBottom: "1px solid #f0f0f0", padding: "14px 16px", color: "#666" }}>
+                    {b.theater_name}
+                  </td>
+                  <td style={{ borderBottom: "1px solid #f0f0f0", padding: "14px 16px" }}>
+                    <span style={{
+                      padding: "4px 12px",
+                      background: b.status === "confirmed" ? "linear-gradient(135deg, #4caf50 0%, #388e3c 100%)" : "linear-gradient(135deg, #f5f5f1 0%, #e8e8e3 100%)",
+                      color: b.status === "confirmed" ? "white" : "#221f1f",
+                      borderRadius: "12px",
+                      fontSize: "13px",
+                      fontWeight: "600",
+                      textTransform: "capitalize"
+                    }}>
+                      {b.status}
+                    </span>
+                  </td>
+                  <td style={{ borderBottom: "1px solid #f0f0f0", padding: "14px 16px", textAlign: "right", fontWeight: "600", color: "#221f1f" }}>
+                    {Number(b.total_amount).toFixed(2)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }
