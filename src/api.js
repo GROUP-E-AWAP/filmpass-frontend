@@ -133,6 +133,15 @@ export const api = {
       method: "POST",
       body: JSON.stringify(payload)
     }),
+    adminListBookings: params => {
+    // Build clean ?query= only for non-empty params
+    const query = new URLSearchParams(
+      Object.entries(params || {}).filter(([, v]) => v != null && v !== "")
+    ).toString();
+
+    const path = query ? `/admin/bookings?${query}` : "/admin/bookings";
+    return fetchJSON(path);
+  },
   
   // Payment
   createCheckoutSession: payload =>
