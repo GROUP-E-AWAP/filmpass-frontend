@@ -142,6 +142,26 @@ export const api = {
     const path = query ? `/admin/bookings?${query}` : "/admin/bookings";
     return fetchJSON(path);
   },
+  // В секцию admin добавь эти методы
+adminDeleteTheater: (theaterId) =>
+  fetchJSON(`/admin/theaters/${theaterId}`, { method: "DELETE" }),
+
+adminDeleteAuditorium: (auditoriumId) =>
+  fetchJSON(`/admin/auditoriums/${auditoriumId}`, { method: "DELETE" }),
+
+adminDeleteMovie: (movieId) =>
+  fetchJSON(`/admin/movies/${movieId}`, { method: "DELETE" }),
+
+adminDeleteShowtime: (showtimeId) =>
+  fetchJSON(`/admin/showtimes/${showtimeId}`, { method: "DELETE" }),
+
+adminDeleteEmployee: (employeeId) =>
+  fetchJSON(`/admin/employees/${employeeId}`, { method: "DELETE" }),
+
+// Новый метод для списка всех сеансов
+adminListShowtimes: () => fetchJSON("/admin/showtimes"),
+
+  // ===== user =====
   
   // Payment
   createCheckoutSession: payload =>

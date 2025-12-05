@@ -24,6 +24,32 @@ function TabButton({ active, onClick, children }) {
   );
 }
 
+function DeleteButton({ onClick, label = "Delete" }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      style={{
+        padding: "8px 12px",
+        background: "#e50914",
+        color: "white",
+        border: "none",
+        borderRadius: "6px",
+        fontSize: "13px",
+        fontWeight: "600",
+        cursor: "pointer",
+        display: "inline-flex",
+        alignItems: "center",
+        gap: "6px"
+      }}
+      onMouseEnter={(e) => e.target.style.background = "#c10812"}
+      onMouseLeave={(e) => e.target.style.background = "#e50914"}
+    >
+      🗑️ {label}
+    </button>
+  );
+}
+
 // ===== Theaters tab =====
 
 /**
@@ -64,6 +90,19 @@ function AdminTheatersTab() {
       setLocation("");
       setMsg("Theater created");
       await load(); // refresh list
+    } catch (e) {
+      setError(e.message);
+    }
+  }
+
+  async function handleDelete(theaterId, theaterName) {
+    if (!window.confirm(`Delete theater "${theaterName}" and ALL related data (auditoriums, showtimes, seats, bookings)? This cannot be undone!`)) return;
+    setError("");
+    setMsg("");
+    try {
+      await api.adminDeleteTheater(theaterId);
+      setMsg(`Theater "${theaterName}" deleted`);
+      await load();
     } catch (e) {
       setError(e.message);
     }
@@ -114,146 +153,70 @@ function AdminTheatersTab() {
         <h4 style={{ fontSize: "18px", fontWeight: "700", marginBottom: "16px", color: "#221f1f" }}>
           Add New Theater
         </h4>
-        <form
-          onSubmit={handleCreate}
-          style={{ display: "grid", gap: "16px" }}
-        >
+        <form onSubmit={handleCreate} style={{ display: "grid", gap: "16px" }}>
           <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-            <label style={{ fontSize: "14px", fontWeight: "600", color: "#221f1f" }}>
-              Theater Name
-            </label>
-            <input
-              value={name}
-              onChange={e => setName(e.target.value)}
-              required
-              style={{
-                padding: "12px 16px",
-                border: "2px solid #e0e0e0",
-                borderRadius: "8px",
-                fontSize: "15px",
-                fontFamily: "inherit",
-                transition: "all 0.3s ease"
-              }}
-              onFocus={(e) => e.target.style.borderColor = "#e50914"}
-              onBlur={(e) => e.target.style.borderColor = "#e0e0e0"}
-            />
-          </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-            <label style={{ fontSize: "14px", fontWeight: "600", color: "#221f1f" }}>
-              Location
-            </label>
-            <input
-              value={location}
-              onChange={e => setLocation(e.target.value)}
-              required
-              style={{
-                padding: "12px 16px",
-                border: "2px solid #e0e0e0",
-                borderRadius: "8px",
-                fontSize: "15px",
-                fontFamily: "inherit",
-                transition: "all 0.3s ease"
-              }}
-              onFocus={(e) => e.target.style.borderColor = "#e50914"}
-              onBlur={(e) => e.target.style.borderColor = "#e0e0e0"}
-            />
-          </div>
-          <button
-            type="submit"
-            style={{
-              padding: "12px 24px",
-              background: "linear-gradient(135deg, #221f1f 0%, #1a1817 100%)",
-              color: "white",
-              border: "none",
+            <label style={{ fontSize: "14px", fontWeight: "600", color: "#221f1f" }}>Theater Name</label>
+            <input value={name} onChange={e => setName(e.target.value)} required style={{
+              padding: "12px 16px",
+              border: "2px solid #e0e0e0",
               borderRadius: "8px",
               fontSize: "15px",
-              fontWeight: "700",
-              cursor: "pointer",
-              transition: "all 0.3s ease",
-              textTransform: "uppercase",
-              letterSpacing: "0.5px"
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.background = "linear-gradient(135deg, #e50914 0%, #c10812 100%)";
-              e.target.style.transform = "translateY(-2px)";
-              e.target.style.boxShadow = "0 6px 20px rgba(229, 9, 20, 0.3)";
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.background = "linear-gradient(135deg, #221f1f 0%, #1a1817 100%)";
-              e.target.style.transform = "translateY(0)";
-              e.target.style.boxShadow = "none";
-            }}
-          >
+              transition: "all 0.3s ease"
+            }} onFocus={e => e.target.style.borderColor = "#e50914"} onBlur={e => e.target.style.borderColor = "#e0e0e0"} />
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+            <label style={{ fontSize: "14px", fontWeight: "600", color: "#221f1f" }}>Location</label>
+            <input value={location} onChange={e => setLocation(e.target.value)} required style={{
+              padding: "12px 16px",
+              border: "2px solid #e0e0e0",
+              borderRadius: "8px",
+              fontSize: "15px",
+              transition: "all 0.3s ease"
+            }} onFocus={e => e.target.style.borderColor = "#e50914"} onBlur={e => e.target.style.borderColor = "#e0e0e0"} />
+          </div>
+          <button type="submit" style={{
+            padding: "12px 24px",
+            background: "linear-gradient(135deg, #221f1f 0%, #1a1817 100%)",
+            color: "white",
+            border: "none",
+            borderRadius: "8px",
+            fontSize: "15px",
+            fontWeight: "700",
+            cursor: "pointer",
+            textTransform: "uppercase",
+            letterSpacing: "0.5px"
+          }}
+            onMouseEnter={e => { e.target.style.background = "linear-gradient(135deg, #e50914 0%, #c10812 100%)"; e.target.style.transform = "translateY(-2px)"; e.target.style.boxShadow = "0 6px 20px rgba(229, 9, 20, 0.3)"; }}
+            onMouseLeave={e => { e.target.style.background = "linear-gradient(135deg, #221f1f 0%, #1a1817 100%)"; e.target.style.transform = "translateY(0)"; e.target.style.boxShadow = "none"; }}>
             Add Theater
           </button>
         </form>
       </div>
 
-      {/* List of existing theaters */}
+      {/* Existing theaters */}
       <h4 style={{ fontSize: "20px", fontWeight: "700", marginBottom: "16px", color: "#221f1f" }}>
         Existing Theaters
       </h4>
-
       {theaters.length === 0 ? (
-        <div style={{
-          textAlign: "center",
-          padding: "40px 20px",
-          color: "#666",
-          fontSize: "16px",
-          background: "white",
-          borderRadius: "12px",
-          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)"
-        }}>
+        <div style={{ textAlign: "center", padding: "40px 20px", color: "#666", background: "white", borderRadius: "12px", boxShadow: "0 4px 12px rgba(0,0,0,0.08)" }}>
           No theaters yet. Add your first theater above.
         </div>
       ) : (
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
-          gap: "20px"
-        }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: "20px" }}>
           {theaters.map(t => (
-            <div
-              key={t.id}
-              style={{
-                background: "white",
-                borderRadius: "12px",
-                padding: "24px",
-                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
-                border: "2px solid transparent",
-                transition: "all 0.3s ease"
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "translateY(-4px)";
-                e.currentTarget.style.boxShadow = "0 12px 24px rgba(0, 0, 0, 0.12)";
-                e.currentTarget.style.borderColor = "#e50914";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "translateY(0)";
-                e.currentTarget.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.08)";
-                e.currentTarget.style.borderColor = "transparent";
-              }}
-            >
-              <div style={{ fontSize: "48px", textAlign: "center", marginBottom: "12px" }}>
-                🎭
-              </div>
-              <h5 style={{
-                fontSize: "18px",
-                fontWeight: "700",
-                color: "#221f1f",
-                marginBottom: "8px",
-                textAlign: "center"
-              }}>
-                {t.name}
-              </h5>
-              <p style={{
-                fontSize: "14px",
-                color: "#666",
-                textAlign: "center",
-                margin: 0
-              }}>
-                📍 {t.location}
-              </p>
+            <div key={t.id} style={{
+              background: "white",
+              borderRadius: "12px",
+              padding: "24px",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+              transition: "all 0.3s ease"
+            }}
+              onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 12px 24px rgba(0,0,0,0.12)"; }}
+              onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.08)"; }}>
+              <div style={{ fontSize: "48px", textAlign: "center", marginBottom: "12px" }}>🎭</div>
+              <h5 style={{ fontSize: "18px", fontWeight: "700", color: "#221f1f", textAlign: "center", marginBottom: "8px" }}>{t.name}</h5>
+              <p style={{ fontSize: "14px", color: "#666", textAlign: "center" }}>📍 {t.location}</p>
+              <DeleteButton onClick={() => handleDelete(t.id, t.name)} label="Delete Theater" />
             </div>
           ))}
         </div>
@@ -323,6 +286,20 @@ function AdminAuditoriumsTab() {
       setCols(10);
       setMsg("Auditorium created and seats generated");
 
+      const data = await api.adminListAuditoriums(selectedTheaterId);
+      setAuditoriums(data);
+    } catch (e) {
+      setError(e.message);
+    }
+  }
+
+  async function handleDelete(auditoriumId, auditoriumName) {
+    if (!window.confirm(`Delete auditorium "${auditoriumName}" and ALL its seats and showtimes?`)) return;
+    setError("");
+    setMsg("");
+    try {
+      await api.adminDeleteAuditorium(auditoriumId);
+      setMsg(`Auditorium "${auditoriumName}" deleted`);
       const data = await api.adminListAuditoriums(selectedTheaterId);
       setAuditoriums(data);
     } catch (e) {
@@ -562,6 +539,7 @@ function AdminAuditoriumsTab() {
                   }}>
                     {a.seat_rows} rows × {a.seat_cols} seats
                   </p>
+                  <DeleteButton onClick={() => handleDelete(a.id, a.name)} label="Delete Auditorium" />
                 </div>
               ))}
             </div>
@@ -583,6 +561,7 @@ function AdminShowtimesTab() {
   const [theaters, setTheaters] = useState([]);
   const [movies, setMovies] = useState([]);
   const [auditoriums, setAuditoriums] = useState([]);
+  const [showtimes, setShowtimes] = useState([]);
 
   // Showtime form state
   const [theaterId, setTheaterId] = useState("");
@@ -694,6 +673,33 @@ function AdminShowtimesTab() {
     }
   }
 
+  async function handleDeleteMovie(movieId, title) {
+    if (!window.confirm(`Delete movie "${title}" and ALL its showtimes and bookings?`)) return;
+    setError("");
+    setMsg("");
+    try {
+      await api.adminDeleteMovie(movieId);
+      setMsg(`Movie "${title}" deleted`);
+      const data = await api.adminListMovies();
+      setMovies(data);
+    } catch (e) {
+      setError(e.message);
+    }
+  }
+
+  async function handleDeleteShowtime(showtimeId, details) {
+    if (!window.confirm(`Delete showtime ${details}?`)) return;
+    setError("");
+    setMsg("");
+    try {
+      await api.adminDeleteShowtime(showtimeId);
+      setMsg("Showtime deleted");
+      // Refresh showtime list
+    } catch (e) {
+      setError(e.message);
+    }
+  }
+
   const inputStyle = {
     padding: "12px 16px",
     border: "2px solid #e0e0e0",
@@ -799,6 +805,29 @@ function AdminShowtimesTab() {
         </form>
       </div>
 
+      {/* Movies list with delete button */}
+      <div style={{ marginTop: "40px" }}>
+        <h4 style={{ fontSize: "20px", fontWeight: "700", marginBottom: "16px", color: "#221f1f" }}>
+          Existing Movies
+        </h4>
+        {movies.length === 0 ? (
+          <div style={{ textAlign: "center", padding: "40px", background: "white", borderRadius: "12px" }}>No movies yet.</div>
+        ) : (
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: "20px" }}>
+            {movies.map(m => (
+              <div key={m.id} style={{ background: "white", borderRadius: "12px", padding: "20px", boxShadow: "0 4px 12px rgba(0,0,0,0.08)" }}>
+                {m.poster_url && <img src={m.poster_url} alt={m.title} style={{ width: "100%", borderRadius: "8px", marginBottom: "12px" }} />}
+                <h5 style={{ fontWeight: "700", fontSize: "18px" }}>{m.title}</h5>
+                <p><strong>Genre:</strong> {m.genre || "—"}</p>
+                <p><strong>Duration:</strong> {m.duration_minutes} min</p>
+                {m.description && <p style={{ fontSize: "14px", color: "#666" }}>{m.description.substring(0, 100)}...</p>}
+                <DeleteButton onClick={() => handleDeleteMovie(m.id, m.title)} label="Delete Movie" />
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
       {/* Create showtime form */}
       <div style={{
         background: "white",
@@ -868,7 +897,63 @@ function AdminShowtimesTab() {
           </button>
         </form>
       </div>
+      {/* === Existing Showtimes === */}
+<div>
+  <h4 style={{ fontSize: "20px", fontWeight: "700", marginBottom: "16px" }}>Existing Showtimes</h4>
+  {showtimes.length === 0 ? (
+    <div style={{ textAlign: "center", padding: "40px", background: "white", borderRadius: "12px", boxShadow: "0 4px 12px rgba(0,0,0,0.08)" }}>
+      No showtimes yet.
     </div>
+  ) : (
+    <div style={{ background: "white", borderRadius: "12px", boxShadow: "0 4px 12px rgba(0,0,0,0.08)", overflow: "hidden" }}>
+      <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <thead>
+          <tr style={{ background: "#f5f5f1" }}>
+            <th style={{ textAlign: "left", padding: "16px", fontWeight: "700" }}>Date</th>
+            <th style={{ textAlign: "left", padding: "16px", fontWeight: "700" }}>Time</th>
+            <th style={{ textAlign: "left", padding: "16px", fontWeight: "700" }}>Movie</th>
+            <th style={{ textAlign: "left", padding: "16px", fontWeight: "700" }}>Theater</th>
+            <th style={{ textAlign: "left", padding: "16px", fontWeight: "700" }}>Auditorium</th>
+            <th style={{ textAlign: "left", padding: "16px", fontWeight: "700" }}>Price</th>
+            <th style={{ textAlign: "left", padding: "16px", fontWeight: "700" }}>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {showtimes.map(s => {
+            const safeDate = s.show_date ? new Date(s.show_date).toLocaleDateString() : '—';
+            const safeTime = (ts) => {
+              if (!ts) return '—';
+              const d = new Date(ts);
+              return isNaN(d.getTime()) ? '—' : d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            };
+            const start = safeTime(s.start_time);
+            const end = safeTime(s.end_time);
+            const details = `${s.movie_title} (${s.theater_name}, ${s.auditorium_name || "—"}) on ${safeDate} ${start}-${end}`;
+
+            return (
+              <tr key={s.id} style={{ borderBottom: "1px solid #f0f0f0" }}
+                onMouseEnter={e => e.currentTarget.style.background = "#f9f9f9"}
+                onMouseLeave={e => e.currentTarget.style.background = "white"}>
+                <td style={{ padding: "14px 16px" }}>{safeDate}</td>
+                <td style={{ padding: "14px 16px" }}>{start} - {end}</td>
+                <td style={{ padding: "14px 16px", fontWeight: "600" }}>{s.movie_title}</td>
+                <td style={{ padding: "14px 16px" }}>{s.theater_name}</td>
+                <td style={{ padding: "14px 16px" }}>{s.auditorium_name || "—"}</td>
+                <td style={{ padding: "14px 16px" }}>${Number(s.price).toFixed(2)}</td>
+                <td style={{ padding: "14px 16px" }}>
+                  <DeleteButton onClick={() => handleDeleteShowtime(s.id, details)} label="Delete" />
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  )}
+</div>
+    </div>
+
+    
   );
 }
 
@@ -942,6 +1027,19 @@ function AdminEmployeesTab() {
       setMsg("Employee created");
 
       await load(); // refresh list
+    } catch (e) {
+      setError(e.message);
+    }
+  }
+
+  async function handleDeleteEmployee(employeeId, name) {
+    if (!window.confirm(`Delete employee "${name}"?`)) return;
+    setError("");
+    setMsg("");
+    try {
+      await api.adminDeleteEmployee(employeeId);
+      setMsg(`Employee "${name}" deleted`);
+      await load();
     } catch (e) {
       setError(e.message);
     }
@@ -1098,6 +1196,9 @@ function AdminEmployeesTab() {
                 <th style={{ borderBottom: "2px solid #e0e0e0", textAlign: "left", padding: "16px", fontWeight: "700", color: "#221f1f" }}>
                   Theater
                 </th>
+                <th style={{ borderBottom: "2px solid #e0e0e0", textAlign: "left", padding: "16px", fontWeight: "700", color: "#221f1f" }}>
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -1105,6 +1206,7 @@ function AdminEmployeesTab() {
                 <tr key={e.id} style={{ transition: "background 0.2s ease" }}
                   onMouseEnter={(ev) => ev.currentTarget.style.background = "#f9f9f9"}
                   onMouseLeave={(ev) => ev.currentTarget.style.background = "white"}>
+                    
                   <td style={{ borderBottom: "1px solid #f0f0f0", padding: "14px 16px", color: "#221f1f" }}>
                     {e.name}
                   </td>
@@ -1126,6 +1228,9 @@ function AdminEmployeesTab() {
                   </td>
                   <td style={{ borderBottom: "1px solid #f0f0f0", padding: "14px 16px", color: "#666" }}>
                     {e.theater_name || "—"}
+                  </td>
+                  <td style={{ borderBottom: "1px solid #f0f0f0", padding: "14px 16px" }}>
+                    <DeleteButton onClick={() => handleDeleteEmployee(e.id, e.name)} label="Delete Employee" />
                   </td>
                 </tr>
               ))}
@@ -1372,42 +1477,14 @@ export default function AdminDashboard() {
   return (
     <div>
       <h2>Admin panel</h2>
-
-      {/* Tab navigation */}
       <div style={{ display: "flex", gap: 8, margin: "12px 0 20px" }}>
-        <TabButton
-          active={tab === "theaters"}
-          onClick={() => setTab("theaters")}
-        >
-          Theaters
-        </TabButton>
-        <TabButton
-          active={tab === "auditoriums"}
-          onClick={() => setTab("auditoriums")}
-        >
-          Auditoriums
-        </TabButton>
-        <TabButton
-          active={tab === "showtimes"}
-          onClick={() => setTab("showtimes")}
-        >
-          Movies & showtimes
-        </TabButton>
-        <TabButton
-          active={tab === "employees"}
-          onClick={() => setTab("employees")}
-        >
-          Employees
-        </TabButton>
-        <TabButton
-          active={tab === "bookings"}
-          onClick={() => setTab("bookings")}
-        >
-          Bookings
-        </TabButton>
+        <TabButton active={tab === "theaters"} onClick={() => setTab("theaters")}>Theaters</TabButton>
+        <TabButton active={tab === "auditoriums"} onClick={() => setTab("auditoriums")}>Auditoriums</TabButton>
+        <TabButton active={tab === "showtimes"} onClick={() => setTab("showtimes")}>Movies & Showtimes</TabButton>
+        <TabButton active={tab === "employees"} onClick={() => setTab("employees")}>Employees</TabButton>
+        <TabButton active={tab === "bookings"} onClick={() => setTab("bookings")}>Bookings</TabButton>
       </div>
 
-      {/* Active tab content */}
       {tab === "theaters" && <AdminTheatersTab />}
       {tab === "auditoriums" && <AdminAuditoriumsTab />}
       {tab === "showtimes" && <AdminShowtimesTab />}
