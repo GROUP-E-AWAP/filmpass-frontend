@@ -694,6 +694,22 @@ function AdminShowtimesTab() {
     }
   }
 
+  // Handle movie deletion
+  async function handleDeleteMovie(id) {
+    if (!window.confirm("Are you sure you want to delete this movie?")) return;
+    setError("");
+    setMsg("");
+    try {
+      await api.adminDeleteMovie(id);
+      setMsg("Movie deleted");
+      // Refresh movie list
+      const data = await api.adminListMovies();
+      setMovies(data);
+    } catch (e) {
+      setError(e.message);
+    }
+  }
+
   const inputStyle = {
     padding: "12px 16px",
     border: "2px solid #e0e0e0",
@@ -868,6 +884,79 @@ function AdminShowtimesTab() {
           </button>
         </form>
       </div>
+
+      {/* List of existing movies */}
+      <h4 style={{ fontSize: "20px", fontWeight: "700", marginBottom: "16px", color: "#221f1f", marginTop: "32px" }}>
+        Existing Movies
+      </h4>
+
+      {movies.length === 0 ? (
+        <div style={{
+          textAlign: "center",
+          padding: "40px 20px",
+          color: "#666",
+          fontSize: "16px",
+          background: "white",
+          borderRadius: "12px",
+          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)"
+        }}>
+          No movies yet. Add your first movie above.
+        </div>
+      ) : (
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+          gap: "20px"
+        }}>
+          {movies.map(m => (
+            <div
+              key={m.id}
+              style={{
+                background: "white",
+                borderRadius: "12px",
+                padding: "16px",
+                boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
+                display: "flex",
+                flexDirection: "column",
+                gap: "12px"
+              }}
+            >
+              {m.poster_url ? (
+                <img src={m.poster_url} alt={m.title} style={{ width: "100%", height: "240px", objectFit: "cover", borderRadius: "8px" }} />
+              ) : (
+                <div style={{ width: "100%", height: "240px", background: "#f0f0f0", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "40px" }}>
+                  🎬
+                </div>
+              )}
+
+              <div style={{ flex: 1 }}>
+                <h5 style={{ fontSize: "16px", fontWeight: "700", margin: "0 0 4px", color: "#221f1f" }}>{m.title}</h5>
+                <p style={{ fontSize: "13px", color: "#666", margin: 0 }}>{m.duration_minutes} min • {m.genre}</p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => handleDeleteMovie(m.id)}
+                style={{
+                  padding: "8px 16px",
+                  background: "#ffebee",
+                  color: "#d32f2f",
+                  border: "none",
+                  borderRadius: "6px",
+                  fontSize: "13px",
+                  fontWeight: "600",
+                  cursor: "pointer",
+                  width: "100%"
+                }}
+                onMouseEnter={(e) => e.target.style.background = "#ffcdd2"}
+                onMouseLeave={(e) => e.target.style.background = "#ffebee"}
+              >
+                Delete
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
