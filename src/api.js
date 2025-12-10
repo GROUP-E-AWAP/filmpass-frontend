@@ -14,7 +14,7 @@ const BASE = import.meta.env.VITE_API_BASE || "/api";
 async function fetchJSON(path, options = {}) {
   const fullUrl = `${BASE}${path}`;
   console.log(`📡 Making API request to: ${fullUrl}`, options?.method || 'GET');
-  
+
   const token = getToken();
 
   const res = await fetch(fullUrl, {
@@ -120,6 +120,11 @@ export const api = {
       body: JSON.stringify(payload)
     }),
 
+  adminDeleteMovie: id =>
+    fetchJSON(`/admin/movies/${id}`, {
+      method: "DELETE"
+    }),
+
   adminCreateShowtime: payload =>
     fetchJSON("/admin/showtimes", {
       method: "POST",
@@ -133,7 +138,7 @@ export const api = {
       method: "POST",
       body: JSON.stringify(payload)
     }),
-    adminListBookings: params => {
+  adminListBookings: params => {
     // Build clean ?query= only for non-empty params
     const query = new URLSearchParams(
       Object.entries(params || {}).filter(([, v]) => v != null && v !== "")
@@ -142,7 +147,7 @@ export const api = {
     const path = query ? `/admin/bookings?${query}` : "/admin/bookings";
     return fetchJSON(path);
   },
-  
+
   // Payment
   createCheckoutSession: payload =>
     fetchJSON(`/create-checkout-session`, {
@@ -150,7 +155,7 @@ export const api = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
     }),
-  
+
   verifyPayment: sessionId =>
     fetchJSON(`/verify-payment?session_id=${encodeURIComponent(sessionId)}`)
 };
