@@ -21,7 +21,7 @@ This will start the development server, and you can view the project in your bro
 * https://witty-forest-0cd95ca1e.3.azurestaticapps.net/
 
 ## CI/CD Diagram
-*https://azurediagrams.com/1xR0ydqc
+* https://azurediagrams.com/1xR0ydqc
 
 
 ## Application Architecture Diagram
