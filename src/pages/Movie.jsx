@@ -219,7 +219,7 @@ export default function Movie() {
               <img src={posterUrl} alt={data.movie.title} />
             ) : (
               <div className="poster-placeholder">
-                <div className="poster-icon">🎬</div>
+                <div className="poster-icon"></div>
                 <div>No poster</div>
               </div>
             )}
@@ -237,13 +237,13 @@ export default function Movie() {
               )}
               {data.movie.genre && (
                 <span className="meta-badge">
-                  <span className="meta-icon">🎭</span>
+                  <span className="meta-icon"></span>
                   {data.movie.genre}
                 </span>
               )}
               {data.movie.release_date && (
                 <span className="meta-badge">
-                  <span className="meta-icon">📅</span>
+                  <span className="meta-icon"></span>
                   {new Date(data.movie.release_date).getFullYear()}
                 </span>
               )}
@@ -295,7 +295,7 @@ export default function Movie() {
             {/* Showtime selector */}
             <div className="form-group">
               <label className="form-label">
-                <span className="label-icon">🎬</span>
+                <span className="label-icon"></span>
                 Choose Showtime
               </label>
               <select
@@ -344,7 +344,7 @@ export default function Movie() {
             {/* Ticket type selector */}
             <div className="form-group">
               <label className="form-label">
-                <span className="label-icon">🎫</span>
+                <span className="label-icon"></span>
                 Ticket Type
               </label>
               <select
